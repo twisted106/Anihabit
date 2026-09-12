@@ -61,14 +61,17 @@ export default function TabletopCard({
   stats = { strength: 10, intellect: 10, discipline: 10, willpower: 10 },
   onClick,
   isPlayer = false,
+  isGreyedOut = false,
   className = ''
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative text-left w-full guardian-card-frame p-2 transition-all duration-200 hover:-translate-y-1.5 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer ${className}`}
-      aria-label={`Inspect ${name} (${category || 'Player'})`}
+      className={`group relative text-left w-full guardian-card-frame p-2 transition-all duration-200 hover:-translate-y-1.5 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer ${
+        isGreyedOut ? 'card-inactive-grey' : ''
+      } ${className}`}
+      aria-label={`Inspect ${name} (${category || 'Player'})${isGreyedOut ? ' - 0 Active Tasks (Dormant)' : ''}`}
     >
       {/* 4 Corner Leaf-Scroll Flourishes (Stitch SVGs) */}
       <LeafCorner positionClass="top-1 left-1" />
