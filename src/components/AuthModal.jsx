@@ -45,12 +45,16 @@ export default function AuthModal({ isOpen, onClose, onGuestMode, notify }) {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fadeIn cursor-pointer"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-dialog-title"
+      onClick={onClose}
     >
-      <div className="guardian-card-frame w-full max-w-md p-6 sm:p-7 bg-wood-planks border-4 border-[#201308] relative shadow-2xl">
+      <div 
+        className="guardian-card-frame w-full max-w-md p-6 sm:p-7 bg-wood-planks border-4 border-[#201308] relative shadow-2xl cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Close Button */}
         <button

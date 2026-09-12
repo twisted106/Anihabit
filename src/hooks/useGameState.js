@@ -17,7 +17,8 @@ import {
   DIFFICULTY_CONFIG,
   CATEGORIES,
   calculateXpToNextLevel,
-  calculatePowerScore
+  calculatePowerScore,
+  getMostRecentMidnightIST
 } from '../constants/gameConfig';
 import { sound } from '../lib/audio';
 import confetti from 'canvas-confetti';
@@ -82,6 +83,16 @@ const DEMO_TASKS = [
     difficulty: 'Easy',
     is_completed: false,
     deadline_at: new Date(Date.now() + 6 * 3600 * 1000).toISOString(),
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'task-5',
+    user_id: 'demo-hero-id',
+    title: 'Review Operating Systems Chapters',
+    category: 'Academics',
+    difficulty: 'Medium',
+    is_completed: false,
+    deadline_at: new Date(Date.now() + 14 * 3600 * 1000).toISOString(),
     created_at: new Date().toISOString()
   }
 ];
@@ -549,12 +560,11 @@ export function useGameState() {
     const targetHabit = habits.find((h) => h.id === habitId);
     if (!targetHabit) return { success: false, error: 'Habit not found' };
 
-    // Check if already completed today (in local timezone)
-    const now = new Date();
+    // Check if already completed today (since most recent midnight IST boundary)
+    const midnightIST = getMostRecentMidnightIST();
     if (targetHabit.last_completed_at) {
       const lastDate = new Date(targetHabit.last_completed_at);
-      const isToday = now.toDateString() === lastDate.toDateString();
-      if (isToday) {
+      if (lastDate >= midnightIST) {
         notify('This habit is already sealed for today! Return tomorrow.', 'info', '⏳');
         return { success: false, reason: 'already_completed' };
       }

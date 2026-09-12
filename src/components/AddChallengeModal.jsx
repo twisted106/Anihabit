@@ -113,12 +113,16 @@ export default function AddChallengeModal({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn cursor-pointer"
       role="dialog"
       aria-modal="true"
       aria-labelledby="add-challenge-title"
+      onClick={handleClose}
     >
-      <div className="guardian-card-frame w-full max-w-lg p-5 sm:p-6 bg-gradient-to-b from-[#211107] via-[#160b05] to-[#0c0502] border-2 border-amber-600/70 shadow-[0_10px_40px_rgba(0,0,0,0.95),0_0_30px_rgba(245,180,40,0.15)] relative rounded-2xl">
+      <div 
+        className="guardian-card-frame w-full max-w-lg p-5 sm:p-6 bg-gradient-to-b from-[#211107] via-[#160b05] to-[#0c0502] border-2 border-amber-600/70 shadow-[0_10px_40px_rgba(0,0,0,0.95),0_0_30px_rgba(245,180,40,0.15)] relative rounded-2xl cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Close Button */}
         <button

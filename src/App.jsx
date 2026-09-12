@@ -246,6 +246,9 @@ export default function App() {
       <CardDetailModal 
         card={inspectedCard}
         tasks={tasks}
+        sessionUser={sessionUser}
+        isDemoMode={isDemoMode}
+        profile={profile}
         onClose={() => setInspectedCard(null)}
         onCompleteTask={completeTask}
       />
