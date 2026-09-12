@@ -137,5 +137,5 @@
 
 /* Circular Medallion Buttons */
 .medallion-btn {
-  @apply rounded-full flex flex-col items-center justify-center transition-transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-400;
+  @apply flex flex-col items-center justify-center transition-transform active:scale-95 focus:outline-none focus-visible:outline-none;
 }

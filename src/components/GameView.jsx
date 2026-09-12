@@ -179,7 +179,7 @@ export default function GameView({
         {/* RIGHT: Active Category Adversaries [lg:col-span-8] */}
         <div className="lg:col-span-8 flex flex-col" data-purpose="enemy-cards-tabletop">
           
-          {/* Section Header with Quick Summon Button */}
+          {/* Section Header */}
           <div className="flex items-center justify-between mb-3 px-1">
             <div className="flex items-center space-x-2">
               <span className="text-amber-400 text-sm font-cinzel font-bold uppercase tracking-wider">
@@ -189,15 +189,6 @@ export default function GameView({
                 4 Categories Active
               </span>
             </div>
-
-            <button 
-              type="button"
-              onClick={onOpenAddChallenge}
-              className="carved-plaque hover:border-amber-400 px-3 py-1 rounded text-xs font-cinzel font-bold text-amber-300 flex items-center gap-1.5 shadow transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none"
-            >
-              <span className="text-amber-400 text-sm font-bold">+</span>
-              <span>Summon Challenge</span>
-            </button>
           </div>
 
           {/* 4 Cards Grid in a Single Row on Desktop */}

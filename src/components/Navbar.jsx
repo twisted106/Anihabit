@@ -60,12 +60,12 @@ export default function Navbar({
         <button
           type="button"
           onClick={() => onSwitchTab('leaderboard')}
-          className="medallion-btn group"
+          className="medallion-btn group focus:outline-none focus-visible:outline-none cursor-pointer"
           title="Leaderboard"
           aria-label="View Leaderboard"
           aria-current={activeTab === 'leaderboard' ? 'page' : undefined}
         >
-          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center ${
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center group-focus-visible:ring-2 group-focus-visible:ring-amber-400 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#160b05] ${
             activeTab === 'leaderboard'
               ? 'bg-gradient-to-b from-amber-400 via-amber-600 to-amber-900 border-yellow-200 shadow-[0_0_16px_rgba(245,180,40,0.6)] scale-105'
               : 'bg-gradient-to-b from-stone-800 to-black border-amber-800/60 hover:border-amber-400 shadow-lg'
@@ -85,12 +85,12 @@ export default function Navbar({
         <button
           type="button"
           onClick={() => onSwitchTab('dashboard')}
-          className="medallion-btn group"
+          className="medallion-btn group focus:outline-none focus-visible:outline-none cursor-pointer"
           title="Player Dashboard"
           aria-label="View Player Dashboard"
           aria-current={activeTab === 'dashboard' ? 'page' : undefined}
         >
-          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center ${
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center group-focus-visible:ring-2 group-focus-visible:ring-emerald-400 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#160b05] ${
             activeTab === 'dashboard'
               ? 'bg-gradient-to-b from-emerald-500 via-emerald-700 to-emerald-950 border-emerald-300 shadow-[0_0_16px_rgba(52,211,153,0.6)] scale-105'
               : 'bg-gradient-to-b from-emerald-950 to-black border-emerald-800/60 hover:border-emerald-400 shadow-lg'
@@ -110,14 +110,14 @@ export default function Navbar({
         <button
           type="button"
           onClick={() => onSwitchTab('gameview')}
-          className="medallion-btn group"
+          className="medallion-btn group focus:outline-none focus-visible:outline-none cursor-pointer"
           title="Habit & Task Tabletop Arena"
           aria-label="View Game Tabletop"
           aria-current={activeTab === 'gameview' ? 'page' : undefined}
         >
-          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center ${
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center group-focus-visible:ring-2 group-focus-visible:ring-amber-400 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#160b05] ${
             activeTab === 'gameview'
-              ? 'bg-gradient-to-b from-amber-400 via-amber-600 to-amber-900 border-yellow-200 shadow-[0_0_20px_rgba(245,180,40,0.7)] scale-110 animate-pulse'
+              ? 'bg-gradient-to-b from-amber-400 via-amber-600 to-amber-900 border-yellow-200 shadow-[0_0_20px_rgba(245,180,40,0.7)] scale-110'
               : 'bg-gradient-to-b from-stone-800 to-black border-amber-800/60 hover:border-amber-400 shadow-lg'
           }`}>
             <div className="w-full h-full rounded-full bg-gradient-to-b from-[#4d1616] to-[#250808] flex items-center justify-center border border-amber-300">
@@ -135,12 +135,12 @@ export default function Navbar({
         <button
           type="button"
           onClick={() => onSwitchTab('shop')}
-          className="medallion-btn group"
+          className="medallion-btn group focus:outline-none focus-visible:outline-none cursor-pointer"
           title="Cosmetics Bazaar"
           aria-label="View Shop"
           aria-current={activeTab === 'shop' ? 'page' : undefined}
         >
-          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center ${
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center group-focus-visible:ring-2 group-focus-visible:ring-purple-400 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#160b05] ${
             activeTab === 'shop'
               ? 'bg-gradient-to-b from-purple-500 via-purple-700 to-purple-950 border-purple-300 shadow-[0_0_16px_rgba(192,132,252,0.6)] scale-105'
               : 'bg-gradient-to-b from-purple-950 to-black border-purple-800/60 hover:border-purple-400 shadow-lg'
