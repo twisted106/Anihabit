@@ -11,7 +11,7 @@ import Navbar from './components/Navbar';
 import CharacterPanel from './components/CharacterPanel';
 import TaskBoard from './components/TaskBoard';
 import HabitBoard from './components/HabitBoard';
-import ArenaView from './components/ArenaView';
+import BattlegroundView from './components/BattlegroundView';
 import TradeoffModal from './components/TradeoffModal';
 import CreateTaskModal from './components/CreateTaskModal';
 import ShopModal from './components/ShopModal';
@@ -90,8 +90,16 @@ export default function App() {
           equippedFrame={equippedFrame}
         />
 
-        {/* 2. The Arena (Cosmetic Guardians & Auras) */}
-        <ArenaView stats={stats} />
+        {/* 2. The Battleground: Live Clash with Nemeses Powered by Uncompleted Quests */}
+        <BattlegroundView
+          stats={stats}
+          tasks={tasks}
+          profile={profile}
+          equippedTitle={equippedTitle}
+          equippedFrame={equippedFrame}
+          onCompleteTask={completeTask}
+          onOpenCreateTask={() => setIsCreateTaskModalOpen(true)}
+        />
 
         {/* 3. The Core Productivity Engines: Tasks & Habits */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
