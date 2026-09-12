@@ -8,26 +8,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        rpg: {
-          dark: '#090b10',
-          panel: '#111520',
-          border: '#1e2638',
-          card: '#161c2b',
-          gold: '#f59e0b',
-          'gold-glow': '#fbbf24',
-          intellect: '#6366f1',
-          'intellect-light': '#818cf8',
-          strength: '#f43f5e',
-          'strength-light': '#fb7185',
-          discipline: '#10b981',
-          'discipline-light': '#34d399',
-          willpower: '#a855f7',
-          'willpower-light': '#c084fc',
-          pressure: '#ef4444'
+        tabletop: {
+          dark: '#120803',
+          wood: '#1d1100',
+          walnut: '#160c00',
+          plank: '#28170c',
+          plankLight: '#361e11',
+          gold: '#c99a3e',
+          goldBright: '#f2bf5f',
+          goldDark: '#8a6520',
+          goldFrame: '#dfb36b',
+          parchment: '#faecd1',
+          parchmentDark: '#e3cba0',
+          parchmentDeep: '#d8b87a',
+          crimson: '#e74c3c',
+          crimsonDark: '#8c2e1b',
+          seal: '#bf2a2a'
+        },
+        parchment: {
+          100: '#FAF0DE',
+          200: '#F4E3C5',
+          300: '#E7CE9D',
+          400: '#D5B67B',
+          500: '#C29F58',
+          800: '#523E1E',
+          900: '#32230D',
+        },
+        wood: {
+          950: '#140c06',
+          900: '#201209',
+          850: '#28170c',
+          800: '#361e11',
+          750: '#442616',
+          700: '#55311c',
         }
       },
       fontFamily: {
         fantasy: ['Cinzel', 'serif'],
+        cinzel: ['Cinzel', 'serif'],
+        garamond: ['"EB Garamond"', 'serif'],
+        newsreader: ['Newsreader', 'serif'],
+        marcellus: ['Marcellus', 'serif'],
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
       },
       boxShadow: {
