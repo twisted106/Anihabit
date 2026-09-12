@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TabletopCard from './TabletopCard';
 import ReincarnationBar from './ReincarnationBar';
-import { calculateXpToNextLevel, MAX_HABIT_DAILY_COINS } from '../constants/gameConfig';
+import { calculateXpToNextLevel, MAX_HABIT_DAILY_COINS, getMostRecentMidnightIST } from '../constants/gameConfig';
 import { BookOpen, Dumbbell, Sparkles, Flame, Coins, Check, Trash2, Plus, ArrowRight } from 'lucide-react';
 
 /**
@@ -117,17 +117,17 @@ export default function GameView({
     return tasks.filter(t => t.category === category && !t.is_completed).length;
   };
 
-  // Completed today summary
-  const completedTasksCount = tasks.filter(t => t.is_completed).length;
+  // Completed today summary (since most recent midnight IST boundary)
+  const midnightIST = getMostRecentMidnightIST();
+  const completedTasksCount = tasks.filter(t => t.is_completed && t.completed_at && new Date(t.completed_at) >= midnightIST).length;
   const totalTasksCount = tasks.length;
   const currentStreak = profile?.current_streak || 0;
 
-  // Helper to determine if habit is checked in today
+  // Helper to determine if habit is checked in today (since most recent midnight IST boundary)
   const isHabitCompletedToday = (lastCompletedAt) => {
     if (!lastCompletedAt) return false;
     const lastDate = new Date(lastCompletedAt);
-    const today = new Date();
-    return lastDate.toDateString() === today.toDateString();
+    return lastDate >= midnightIST;
   };
 
   return (
