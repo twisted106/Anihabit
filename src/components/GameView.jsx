@@ -275,7 +275,7 @@ export default function GameView({
           {/* ========================================================================= */}
           {viewMode === 'tasks' && (
             <div className="flex flex-col space-y-4" data-purpose="tasks-mode-panel">
-              {/* Section Header with Quick Summon Button */}
+              {/* Section Header */}
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center space-x-2">
                   <span className="text-amber-400 text-sm font-cinzel font-bold uppercase tracking-wider">
@@ -285,15 +285,6 @@ export default function GameView({
                     4 Domains Active
                   </span>
                 </div>
-
-                <button 
-                  type="button"
-                  onClick={onOpenAddChallenge}
-                  className="carved-plaque hover:border-amber-400 px-3 py-1 rounded text-xs font-cinzel font-bold text-amber-300 flex items-center gap-1.5 shadow transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
-                >
-                  <span className="text-amber-400 text-sm font-bold">+</span>
-                  <span>Summon Challenge</span>
-                </button>
               </div>
 
               {/* 4 Adversary Cards Grid */}
@@ -364,15 +355,6 @@ export default function GameView({
                     {habits.length} Inscribed
                   </span>
                 </div>
-
-                <button 
-                  type="button"
-                  onClick={onOpenAddChallenge}
-                  className="carved-plaque hover:border-amber-400 px-3 py-1 rounded text-xs font-cinzel font-bold text-amber-300 flex items-center gap-1.5 shadow transition-all hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
-                >
-                  <Plus className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Summon Habit</span>
-                </button>
               </div>
 
               {/* Habit Ledger Container */}

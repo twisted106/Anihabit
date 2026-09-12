@@ -31,6 +31,9 @@
 | **Phase 9: Audio & Celebration Polish** | ✅ DONE | 100% |
 | **Phase 10: A11y, Responsiveness & Verification**| ✅ DONE | 100% |
 | **Phase 14: Habit Forge & Tabletop Habit Mode** | ✅ DONE | 100% |
+| **Phase 15: Clean Header Actions (Remove Summon Buttons)** | ✅ DONE | 100% |
+
+
 
 
 
@@ -115,4 +118,17 @@
 | **HABIT-04** | Tabletop Habit Mode Ledger | Antique ledger layout with semantic `<button>` rows, flame streak tally, $\min(\text{streak}+1, 10)$ coin bounty, and sealed-for-today state | ✅ `[DONE]` |
 | **HABIT-05** | 3-Step Add Challenge Wizard | Add Step 1 (Task vs. Habit) in `AddChallengeModal.jsx`, skipping difficulty chips for habits | ✅ `[DONE]` |
 | **HABIT-06** | A11y, Mobile & Anti-Double-Pay Test | Keyboard navigation test, mobile reflow check, and verification that duplicate calls to `completeHabit` are rejected | ✅ `[DONE]` |
+
+---
+
+### Phase 15: Clean Header Actions (Removal of Redundant Summon Buttons)
+*Streamlining Game View headers by removing redundant inline summon buttons.*
+
+| Task ID | Task Title | Description | Status |
+|---|---|---|:---:|
+| **CLEAN-01** | Remove Summon Challenge Button | Remove `<button>Summon Challenge</button>` from Task mode header in `GameView.jsx` | ✅ `[DONE]` |
+| **CLEAN-02** | Remove Summon Habit Button | Remove `<button>Summon Habit</button>` from Habit mode header in `GameView.jsx` | ✅ `[DONE]` |
+| **CLEAN-03** | Build Verification | Confirm zero syntax/compile errors with `vite build` | ✅ `[DONE]` |
+
+
 
