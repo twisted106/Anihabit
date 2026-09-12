@@ -23,7 +23,7 @@
 | **Phase 1: Auth & Session Management** | ✅ DONE | 100% |
 | **Phase 2: Unified Game State Engine** | ✅ DONE | 100% |
 | **Phase 3: Character HUD & Pressure Gauge** | ✅ DONE | 100% |
-| **Phase 4: Dynamic Battleground (Hero vs Nemesis)** | 🔄 NEXT UP | 0% |
+| **Phase 4: Multi-Enemy Frontline Battleground & Animations** | 🔄 NEXT UP | 0% |
 | **Phase 5: Categorized Task Matrix** | ✅ DONE | 100% |
 | **Phase 6: Habit Forge (Streaks & Coins)** | ✅ DONE | 100% |
 | **Phase 7: Cosmetic Shop & Inventory** | ✅ DONE | 100% |
@@ -52,14 +52,14 @@
 
 ---
 
-### Phase 4: Dynamic Battleground (Hero vs Nemesis Standoff)
-*Replaces the static Arena cards with an interactive duel stage where enemies draw power from uncompleted tasks.*
+### Phase 4: Multi-Enemy Frontline Battleground & Combat Animations
+*Renders the hero facing all 4 category nemeses simultaneously, powered by uncompleted quests and animated with attack sequences.*
 
 | Task ID | Task Title | Description | Status |
 |---|---|---|:---:|
-| **BATTLE-01** | Remove ArenaView | Decommission static `ArenaView.jsx` while preserving all category enemy data | ✅ `[DONE]` |
-| **BATTLE-02** | Standoff Arena Canvas (`BattlegroundView.jsx`) | Dual-view arena: Player avatar on the left, active category nemesis on the right | ✅ `[DONE]` |
-| **BATTLE-03** | Task-Fueled Enemy Threat Engine | Enemy threat level, visual size, and dark aura scale dynamically with incomplete/overdue category tasks | ✅ `[DONE]` |
-| **BATTLE-04** | Category Nemesis Selector | Switch between the 4 nemeses (Chronos, Sloth Behemoth, Chaos Chimera, Phantom) to inspect fueling tasks | ✅ `[DONE]` |
-| **BATTLE-05** | Subdued/Banished Victory State | When all tasks in a category are completed, show enemy subdued with victory radiance | ✅ `[DONE]` |
-| **BATTLE-06** | Production Build & Integration | Mount `BattlegroundView` in `App.jsx` and verify zero errors with `vite build` | ✅ `[DONE]` |
+| **FRONTLINE-01** | Combat Animation Keyframes | Add `float`, `pulseDanger`, `strikeFlash`, and `energyBeam` in Tailwind & CSS | ✅ `[DONE]` |
+| **FRONTLINE-02** | 4-Enemy Standoff Formation | Hero Avatar positioned facing all 4 category bosses simultaneously on the battlefield | ✅ `[DONE]` |
+| **FRONTLINE-03** | Dynamic Task-Driven Threat Engine | Real-time threat %, power rating, and dark particle auras driven by incomplete category quests | ✅ `[DONE]` |
+| **FRONTLINE-04** | Animated Attack Sequences | Projectile beam traveling from avatar to target nemesis upon quest completion with hit-shake | ✅ `[DONE]` |
+| **FRONTLINE-05** | Frontline Target Inspection | Click any nemesis in the lineup to focus camera and reveal its fueling quests | ✅ `[DONE]` |
+| **FRONTLINE-06** | Build & Hot Reload Verification | Verify smooth 60fps animations and zero errors with `vite build` | ✅ `[DONE]` |

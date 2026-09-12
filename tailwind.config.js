@@ -43,15 +43,31 @@ export default {
           '0%, 100%': { opacity: '1', transform: 'scale(1)' },
           '50%': { opacity: '0.85', transform: 'scale(1.02)' }
         },
-        shake: {
+        pulseDanger: {
+          '0%, 100%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 8px rgba(244, 63, 94, 0.5))' },
+          '50%': { transform: 'scale(1.06)', filter: 'drop-shadow(0 0 22px rgba(244, 63, 94, 0.95))' }
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' }
+        },
+        hitShake: {
           '0%, 100%': { transform: 'translateX(0)' },
-          '20%, 60%': { transform: 'translateX(-4px)' },
-          '40%, 80%': { transform: 'translateX(4px)' }
+          '20%, 60%': { transform: 'translateX(-8px) scale(0.96)' },
+          '40%, 80%': { transform: 'translateX(8px) scale(1.04)' }
+        },
+        beamStrike: {
+          '0%': { opacity: '0', transform: 'scaleX(0)' },
+          '30%': { opacity: '1', transform: 'scaleX(1)' },
+          '100%': { opacity: '0', transform: 'scaleX(1)' }
         }
       },
       animation: {
         'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
-        'shake': 'shake 0.4s ease-in-out'
+        'pulse-danger': 'pulseDanger 1.6s infinite ease-in-out',
+        'float': 'float 3.5s infinite ease-in-out',
+        'hit-shake': 'hitShake 0.4s ease-in-out',
+        'beam-strike': 'beamStrike 0.6s ease-out forwards'
       }
     },
   },
