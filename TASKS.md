@@ -88,3 +88,14 @@
 | **KEY-02** | Production Environment Pairing | Paired with verified live Supabase cloud instance (`hjiijtdugdfxducnraut`) | ✅ `[DONE]` |
 | **KEY-03** | `.env` File Generation | Generated local `.env` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` | ✅ `[DONE]` |
 | **KEY-04** | Hot Reload & Build Verification | Re-verified build with active `.env` configuration | ✅ `[DONE]` |
+
+---
+
+### Phase 13: System Workflow & Architecture Documentation
+*End-to-end documentation of user journey, component state flow, and database RPC interactions.*
+
+| Task ID | Task Title | Description | Status |
+|---|---|---|:---:|
+| **FLOW-01** | Master Workflow Architecture Guide | Generated comprehensive [`WORKFLOW.md`](./WORKFLOW.md) covering all subsystems | ✅ `[DONE]` |
+| **FLOW-02** | System Interaction Flowchart | Documented user flow from authentication through combat, habits, and crisis | ✅ `[DONE]` |
+| **FLOW-03** | Mathematical & Security Verification | Formalized all leveling, streak, reincarnation, and RLS mechanics | ✅ `[DONE]` |
