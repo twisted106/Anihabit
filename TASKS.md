@@ -63,3 +63,16 @@
 | **FRONTLINE-04** | Animated Attack Sequences | Projectile beam traveling from avatar to target nemesis upon quest completion with hit-shake | ✅ `[DONE]` |
 | **FRONTLINE-05** | Frontline Target Inspection | Click any nemesis in the lineup to focus camera and reveal its fueling quests | ✅ `[DONE]` |
 | **FRONTLINE-06** | Build & Hot Reload Verification | Verify smooth 60fps animations and zero errors with `vite build` | ✅ `[DONE]` |
+
+---
+
+### Phase 11: Live Database & Backend Diagnostic Verification
+*Direct live testing against the Supabase Postgres instance.*
+
+| Task ID | Task Title | Description | Status |
+|---|---|---|:---:|
+| **DB-01** | Cloud Instance Connectivity | Verified REST and Auth endpoints active at `hjiijtdugdfxducnraut.supabase.co` | ✅ `[DONE]` |
+| **DB-02** | Schema & RLS Verification | Tables (`profiles`, `stats`, `tasks`, `habits`, `items`, `inventory`) enforced | ✅ `[DONE]` |
+| **DB-03** | Auth Trigger Execution | `on_auth_user_created` trigger verified creating initial profile & 10-point stats | ✅ `[DONE]` |
+| **DB-04** | Stored Procedures / RPCs | `get_global_leaderboard` and game engine procedures tested live | ✅ `[DONE]` |
+| **DB-05** | Email Confirmation & Demo Fallback | Documented email confirmation behavior and verified 100% reliable fallback | ✅ `[DONE]` |

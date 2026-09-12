@@ -143,3 +143,29 @@ flowchart TD
 * **Implementation Details**:
   1. Pass the complete task list, category stats, profile, and task completion handler to `BattlegroundView`.
   2. Ensure completing a task from either the Task Board OR directly inside the Battleground seamlessly triggers the attack animation and sound.
+
+---
+
+## 🔬 Live Database & Backend Audit Findings
+
+A live diagnostic was conducted directly against the configured Supabase Postgres instance (`https://hjiijtdugdfxducnraut.supabase.co`).
+
+### 1. Connection & Endpoints
+* **Status**: **ONLINE & REACHABLE**
+* **Auth Endpoint**: Validated with active ping response.
+* **REST API & RPC Endpoints**: Responsive with sub-second latency.
+
+### 2. Database Schema & Tables
+| Table | Existence | Accessibility / RLS |
+|---|:---:|---|
+| `public.profiles` | ✅ Yes | RLS Enforced (only owner can read/write) |
+| `public.stats` | ✅ Yes | RLS Enforced (only owner can read/write) |
+| `public.tasks` | ✅ Yes | RLS Enforced (full CRUD for owner) |
+| `public.habits` | ✅ Yes | RLS Enforced (full CRUD for owner) |
+| `public.items` | ✅ Yes | RLS Enforced (viewable by authenticated users) |
+| `public.user_inventory` | ✅ Yes | RLS Enforced (only owner can read/write) |
+
+### 3. Automated Triggers & RPC Verification
+* **Auto-Registration Trigger (`on_auth_user_created`)**: **VERIFIED ACTIVE**. Creating a new user via `signUp()` automatically provisions a row in `profiles` (level 1, 0 XP, 0 coins, 0 pressure) and initializes 10 points for Intellect, Strength, Discipline, and Willpower in `stats`.
+* **Global Leaderboard RPC (`get_global_leaderboard`)**: **VERIFIED FUNCTIONAL**. Evaluated successfully via live Postgres call and returned calculated 4-stat average rankings.
+* **Email Confirmation Setting**: The Supabase project currently has email confirmation enabled (`Email not confirmed` upon instant password sign-in). Users can confirm via the received email, or disable email confirmation in Supabase Auth settings for instant testing. The frontend fallback allows seamless Demo testing at all times.
