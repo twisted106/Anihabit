@@ -169,3 +169,15 @@ A live diagnostic was conducted directly against the configured Supabase Postgre
 * **Auto-Registration Trigger (`on_auth_user_created`)**: **VERIFIED ACTIVE**. Creating a new user via `signUp()` automatically provisions a row in `profiles` (level 1, 0 XP, 0 coins, 0 pressure) and initializes 10 points for Intellect, Strength, Discipline, and Willpower in `stats`.
 * **Global Leaderboard RPC (`get_global_leaderboard`)**: **VERIFIED FUNCTIONAL**. Evaluated successfully via live Postgres call and returned calculated 4-stat average rankings.
 * **Email Confirmation Setting**: The Supabase project currently has email confirmation enabled (`Email not confirmed` upon instant password sign-in). Users can confirm via the received email, or disable email confirmation in Supabase Auth settings for instant testing. The frontend fallback allows seamless Demo testing at all times.
+
+---
+
+## 🔑 Custom Key Integration & Environment Setup
+
+When linking custom Supabase keys (`sb_publishable_...` and `sb_secret_...`):
+1. **Environment Pairing**: In Supabase, API keys are cryptographically bound to a specific **Project URL** (`https://<project-ref>.supabase.co`).
+2. **Active Production Setup**:
+   - Written `.env` with the verified cloud instance credentials (`https://hjiijtdugdfxducnraut.supabase.co`) where the complete Postgres database schema, RLS policies, triggers, and RPCs are deployed.
+   - Provided seamless swap capability: if a different Supabase project URL is desired, simply updating `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env` immediately redirects the entire app.
+3. **Zero-Friction Evaluation**:
+   - The app actively supports authenticated Supabase sessions alongside the **Instant Demo Hero** mode, guaranteeing hackathon judges and reviewers can evaluate every mechanic (tasks, streaks, battleground strikes, shop, leaderboard) without mandatory email verification hurdles.
