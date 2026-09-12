@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-rpg-dark text-slate-100 antialiased selection:bg-indigo-600 selection:text-white;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom styled scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #090b10;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e2638;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a354f;
+  }
+}
+
+@layer components {
+  /* Glass card helper */
+  .rpg-card {
+    @apply bg-rpg-card/80 backdrop-blur-md border border-rpg-border rounded-xl shadow-lg;
+  }
+  
+  .rpg-panel {
+    @apply bg-rpg-panel/90 backdrop-blur-md border border-rpg-border rounded-2xl;
+  }
+
+  /* Interactive button focus states for strict accessibility */
+  .rpg-btn {
+    @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-rpg-dark disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer;
+  }
+}
