@@ -44,12 +44,14 @@ export default function App() {
     equippedFrame,
 
     // Actions
+    signOut,
     createTask,
     completeTask,
     deleteTask,
     createHabit,
     checkInHabit,
     resolveTradeoff,
+    adjustReincarnationPressure,
     buyShopItem,
     toggleEquipItem,
     fetchLeaderboard,
@@ -105,7 +107,7 @@ export default function App() {
         isDemoMode={isDemoMode}
         profile={profile}
         onOpenAuth={() => setIsAuthModalOpen(true)}
-        onSignOut={() => setIsDemoMode(true)}
+        onSignOut={signOut}
         isMuted={isMuted}
         onToggleMute={toggleMute}
       />
@@ -122,6 +124,7 @@ export default function App() {
             onInspectCard={(card) => setInspectedCard(card)}
             onOpenAddChallenge={() => setIsCreateTaskModalOpen(true)}
             onOpenTradeoffModal={() => setIsTradeoffModalOpen(true)}
+            onAdjustPressure={adjustReincarnationPressure}
           />
         )}
 

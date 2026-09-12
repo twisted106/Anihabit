@@ -67,7 +67,8 @@ export default function GameView({
   habits,
   onInspectCard,
   onOpenAddChallenge,
-  onOpenTradeoffModal
+  onOpenTradeoffModal,
+  onAdjustPressure
 }) {
   const level = profile?.current_level || 1;
   const currentXp = Number(profile?.current_xp || 0);
@@ -116,6 +117,7 @@ export default function GameView({
       <ReincarnationBar 
         meterValue={profile?.reincarnation_meter || 0}
         onOpenTradeoffModal={onOpenTradeoffModal}
+        onAdjustPressure={onAdjustPressure}
       />
 
       {/* 4. Desktop Tabletop Standoff Layout:

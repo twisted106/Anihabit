@@ -276,6 +276,8 @@ export function useGameState() {
         setIsDemoMode(true);
         setProfile(DEMO_PROFILE);
         setStats(DEMO_STATS);
+        setTasks(DEMO_TASKS);
+        setHabits(DEMO_HABITS);
       }
     });
 
@@ -605,6 +607,34 @@ export function useGameState() {
   }, [isDemoMode, sessionUser, refreshGameData, notify]);
 
   // =====================================================================
+  // ACTIONS: REINCARNATION TESTING HELPER
+  // =====================================================================
+  const adjustReincarnationPressure = useCallback(async (amount) => {
+    const current = Number(profile?.reincarnation_meter || 0);
+    const newMeter = Math.min(100, Math.max(0, current + amount));
+    setProfile((prev) => ({ ...prev, reincarnation_meter: newMeter }));
+
+    if (isSupabaseConfigured && !isDemoMode && sessionUser) {
+      try {
+        await supabase.from('profiles').update({ reincarnation_meter: newMeter }).eq('id', sessionUser.id);
+      } catch (err) {
+        console.warn('Could not sync demo reincarnation_meter change to database:', err);
+      }
+    }
+
+    if (newMeter >= 100) {
+      setIsTradeoffModalOpen(true);
+      notify('Reincarnation Pressure reached 100%! Crisis initiated!', 'danger', '🔥');
+    } else if (amount > 0) {
+      notify(`Simulated missed task: +${amount}% Pressure (Current: ${newMeter}%)`, 'warning', '⚠️');
+    } else if (amount < 0 && newMeter === 0) {
+      notify('Reincarnation Pressure reset to 0%', 'info', '⚖️');
+    } else {
+      notify(`Reincarnation pressure set to ${newMeter}%`, 'info', '⚖️');
+    }
+  }, [profile?.reincarnation_meter, isSupabaseConfigured, isDemoMode, sessionUser, setIsTradeoffModalOpen, notify]);
+
+  // =====================================================================
   // ACTIONS: COSMETICS SHOP & INVENTORY
   // =====================================================================
   const buyShopItem = useCallback(async (item) => {
@@ -672,6 +702,25 @@ export function useGameState() {
     notify(`Inventory gear adjusted for "${targetItem.name}"`, 'info', '🛡️');
   }, [shopItems, notify]);
 
+  // Sign Out Handler
+  const signOut = useCallback(async () => {
+    try {
+      if (isSupabaseConfigured) {
+        await supabase.auth.signOut();
+      }
+    } catch (err) {
+      console.warn('Error during Supabase sign out:', err);
+    } finally {
+      setSessionUser(null);
+      setIsDemoMode(true);
+      setProfile(DEMO_PROFILE);
+      setStats(DEMO_STATS);
+      setTasks(DEMO_TASKS);
+      setHabits(DEMO_HABITS);
+      notify('You have departed the tavern. Returned to guest mode.', 'info', '🚪');
+    }
+  }, [notify]);
+
   // Derived Values
   const powerScore = calculatePowerScore(stats);
   const xpNeeded = calculateXpToNextLevel(profile.current_level);
@@ -703,12 +752,14 @@ export function useGameState() {
     equippedFrame: shopItems.find((i) => i.id === equippedFrame?.item_id)?.id || null,
 
     // Actions
+    signOut,
     createTask,
     completeTask,
     deleteTask,
     createHabit,
     checkInHabit,
     resolveTradeoff,
+    adjustReincarnationPressure,
     buyShopItem,
     toggleEquipItem,
     fetchLeaderboard,

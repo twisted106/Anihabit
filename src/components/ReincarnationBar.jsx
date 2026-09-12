@@ -9,7 +9,8 @@ import { RECEIVE_ON_FAIL, REDUCE_ON_COMPLETE, REINCARNATION_MAX } from '../const
  */
 export default function ReincarnationBar({
   meterValue = 0,
-  onOpenTradeoffModal
+  onOpenTradeoffModal,
+  onAdjustPressure
 }) {
   const clampedValue = Math.min(REINCARNATION_MAX, Math.max(0, Math.round(meterValue)));
   const percentage = (clampedValue / REINCARNATION_MAX) * 100;
@@ -42,18 +43,62 @@ export default function ReincarnationBar({
           </span>
         </div>
 
-        {/* Crisis Warning Button */}
-        {percentage >= 70 && (
-          <button
-            type="button"
-            onClick={onOpenTradeoffModal}
-            className="text-xs font-cinzel font-bold text-red-300 hover:text-red-100 border border-red-600/70 hover:border-red-400 bg-red-950/60 hover:bg-red-900/80 px-3 py-1 rounded transition-all active:scale-95 flex items-center gap-1.5 shadow"
-          >
-            <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-ping" />
-            <span>CRISIS IMMINENT AT 100%</span>
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-          </button>
-        )}
+        {/* Action & Testing Controls */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Demo Reincarnation Testing Button Group */}
+          {onAdjustPressure && (
+            <div className="flex items-center gap-1.5 bg-black/60 border border-amber-700/60 px-2 py-1 rounded-lg shadow-inner">
+              <span className="text-[10px] font-cinzel text-amber-400/90 uppercase tracking-wider font-bold mr-0.5">
+                🧪 Demo Test:
+              </span>
+
+              {/* Button 1: Simulate Missed Task (+15%) */}
+              <button
+                type="button"
+                onClick={() => onAdjustPressure(RECEIVE_ON_FAIL)}
+                className="px-2 py-0.5 rounded bg-red-950 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/70 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title={`Simulate a missed task (+${RECEIVE_ON_FAIL}% Pressure)`}
+              >
+                +{RECEIVE_ON_FAIL}% Miss
+              </button>
+
+              {/* Button 2: Immediate 100% Crisis Trigger */}
+              <button
+                type="button"
+                onClick={() => onAdjustPressure(100)}
+                className="px-2.5 py-0.5 rounded bg-gradient-to-r from-red-700 to-amber-600 hover:from-red-600 hover:to-amber-500 text-amber-100 hover:text-white border border-amber-400/80 text-[10px] font-cinzel font-black shadow transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title="Immediately surge pressure to 100% to test the Crisis Dilemma Modal"
+              >
+                ⚡ Test 100% Crisis
+              </button>
+
+              {/* Button 3: Reset to 0% */}
+              {clampedValue > 0 && (
+                <button
+                  type="button"
+                  onClick={() => onAdjustPressure(-clampedValue)}
+                  className="px-1.5 py-0.5 rounded bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-700 text-[10px] font-cinzel font-bold transition-all active:scale-95 cursor-pointer focus:outline-none"
+                  title="Reset reincarnation pressure back to 0%"
+                >
+                  ↺ Reset 0%
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* High-Pressure Warning Alert */}
+          {percentage >= 70 && (
+            <button
+              type="button"
+              onClick={onOpenTradeoffModal}
+              className="text-xs font-cinzel font-bold text-red-300 hover:text-red-100 border border-red-600/70 hover:border-red-400 bg-red-950/60 hover:bg-red-900/80 px-2.5 py-1 rounded transition-all active:scale-95 flex items-center gap-1.5 shadow"
+            >
+              <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-ping" />
+              <span>CRISIS AT 100%</span>
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Meter Track */}
