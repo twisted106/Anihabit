@@ -30,6 +30,9 @@
 | **Phase 8: Global Leaderboard** | ✅ DONE | 100% |
 | **Phase 9: Audio & Celebration Polish** | ✅ DONE | 100% |
 | **Phase 10: A11y, Responsiveness & Verification**| ✅ DONE | 100% |
+| **Phase 14: Habit Forge & Tabletop Habit Mode** | ✅ DONE | 100% |
+
+
 
 ---
 
@@ -99,3 +102,17 @@
 | **FLOW-01** | Master Workflow Architecture Guide | Generated comprehensive [`WORKFLOW.md`](./WORKFLOW.md) covering all subsystems | ✅ `[DONE]` |
 | **FLOW-02** | System Interaction Flowchart | Documented user flow from authentication through combat, habits, and crisis | ✅ `[DONE]` |
 | **FLOW-03** | Mathematical & Security Verification | Formalized all leveling, streak, reincarnation, and RLS mechanics | ✅ `[DONE]` |
+
+---
+
+### Phase 14: Habit Forge Integration & Tavern Tabletop Habit Mode
+*Full integration of daily recurring habits into the Tavern Hearth Tabletop interface.*
+
+| Task ID | Task Title | Description | Status |
+|---|---|---|:---:|
+| **HABIT-02** | Client RPC & State Methods | Add `fetchHabits`, `createHabit(title, category)`, `deleteHabit`, and `completeHabit` with server `coin_balance` authority and toast handling for daily lockouts | ✅ `[DONE]` |
+| **HABIT-03** | Tavern Rocker Toggle Switch | Carved wooden/bronze switch in `GameView.jsx` toggling Task vs. Habit mode with `aria-pressed` | ✅ `[DONE]` |
+| **HABIT-04** | Tabletop Habit Mode Ledger | Antique ledger layout with semantic `<button>` rows, flame streak tally, $\min(\text{streak}+1, 10)$ coin bounty, and sealed-for-today state | ✅ `[DONE]` |
+| **HABIT-05** | 3-Step Add Challenge Wizard | Add Step 1 (Task vs. Habit) in `AddChallengeModal.jsx`, skipping difficulty chips for habits | ✅ `[DONE]` |
+| **HABIT-06** | A11y, Mobile & Anti-Double-Pay Test | Keyboard navigation test, mobile reflow check, and verification that duplicate calls to `completeHabit` are rejected | ✅ `[DONE]` |
+

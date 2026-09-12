@@ -463,17 +463,39 @@ export function useGameState() {
   // =====================================================================
   // ACTIONS: HABIT FORGE & STREAKS (SOLE SOURCE OF COINS)
   // =====================================================================
-  const createHabit = useCallback(async ({ title, category }) => {
+  const fetchHabits = useCallback(async () => {
+    if (!isSupabaseConfigured || isDemoMode || !sessionUser) return;
+    try {
+      const { data, error } = await supabase
+        .from('habits')
+        .select('*')
+        .eq('user_id', sessionUser.id)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setHabits(data);
+      }
+    } catch (err) {
+      console.error('fetchHabits error:', err);
+    }
+  }, [isDemoMode, sessionUser]);
+
+  const createHabit = useCallback(async (titleOrObj, maybeCategory) => {
+    const title = typeof titleOrObj === 'object' && titleOrObj !== null ? titleOrObj?.title : titleOrObj;
+    const category = typeof titleOrObj === 'object' && titleOrObj !== null ? titleOrObj?.category : maybeCategory;
+
     if (!title?.trim()) {
       notify('Please enter a habit title', 'warning', '⚠️');
       return false;
     }
 
+    const habitCategory = category || 'Lifestyle';
+
     const newHabit = {
       id: `habit-${Date.now()}`,
       user_id: sessionUser?.id || 'demo-hero-id',
       title: title.trim(),
-      category,
+      category: habitCategory,
       current_streak: 0,
       longest_streak: 0,
       last_completed_at: null,
@@ -487,7 +509,10 @@ export function useGameState() {
           .insert([{
             user_id: sessionUser.id,
             title: title.trim(),
-            category
+            category: habitCategory,
+            current_streak: 0,
+            longest_streak: 0,
+            last_completed_at: null
           }])
           .select()
           .single();
@@ -502,22 +527,34 @@ export function useGameState() {
     }
 
     setHabits((prev) => [newHabit, ...prev]);
-    notify(`Habit forged: "${title}" (${category})`, 'success', '🔥');
+    notify(`Habit forged: "${title}" (${habitCategory})`, 'success', '🔥');
     return true;
   }, [isDemoMode, sessionUser, notify]);
 
-  const checkInHabit = useCallback(async (habitId) => {
-    const targetHabit = habits.find((h) => h.id === habitId);
-    if (!targetHabit) return;
+  const deleteHabit = useCallback(async (habitId) => {
+    if (isSupabaseConfigured && !isDemoMode && sessionUser) {
+      try {
+        await supabase.from('habits').delete().eq('id', habitId);
+      } catch (err) {
+        console.error('Delete habit error:', err);
+      }
+    }
+    setHabits((prev) => prev.filter((h) => h.id !== habitId));
+    notify('Habit banished from discipline ledger', 'info', '🗑️');
+  }, [isDemoMode, sessionUser, notify]);
 
-    // Check if already completed today
+  const completeHabit = useCallback(async (habitId) => {
+    const targetHabit = habits.find((h) => h.id === habitId);
+    if (!targetHabit) return { success: false, error: 'Habit not found' };
+
+    // Check if already completed today (in local timezone)
     const now = new Date();
     if (targetHabit.last_completed_at) {
       const lastDate = new Date(targetHabit.last_completed_at);
       const isToday = now.toDateString() === lastDate.toDateString();
       if (isToday) {
-        notify('Habit already fortified for today! Come back tomorrow.', 'info', '⏳');
-        return;
+        notify('This habit is already sealed for today! Return tomorrow.', 'info', '⏳');
+        return { success: false, reason: 'already_completed' };
       }
     }
 
@@ -528,17 +565,38 @@ export function useGameState() {
       try {
         const { data, error } = await supabase.rpc('complete_habit', { p_habit_id: habitId });
         if (error) {
+          // Handle "already completed today" rejection as an expected state (surface as a toast), not an error state
+          if (error.message && error.message.toLowerCase().includes('already completed today')) {
+            notify('This habit is already sealed for today! Return tomorrow.', 'info', '⏳');
+            return { success: false, reason: 'already_completed' };
+          }
           console.error('complete_habit RPC error:', error);
           notify(error.message || 'Error checking in habit', 'danger', '❌');
-          return;
+          return { success: false, error };
         }
         if (data) {
-          refreshGameData(sessionUser.id);
+          // coin_balance in client state must be set from what the RPC / server returns, never incremented locally
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('coin_balance, current_level, current_xp')
+            .eq('id', sessionUser.id)
+            .single();
+
+          if (profileData) {
+            setProfile((prev) => ({
+              ...prev,
+              coin_balance: profileData.coin_balance
+            }));
+          }
+
+          // Refresh habits state from database
+          await fetchHabits();
+
           notify(`Streak ${data.current_streak} Days! Earned +${data.coins_awarded} Gold Coins!`, 'gold', '🪙');
-          return;
+          return data;
         }
       } catch (err) {
-        console.error('Habit checkin error:', err);
+        console.error('Habit completion error:', err);
       }
     }
 
@@ -557,11 +615,21 @@ export function useGameState() {
 
     setProfile((prev) => ({
       ...prev,
-      coin_balance: prev.coin_balance + coinsAwarded
+      coin_balance: (prev.coin_balance || 0) + coinsAwarded
     }));
 
     notify(`Streak increased to ${newStreak}! +${coinsAwarded} Gold Coins deposited in pouch!`, 'gold', '🪙');
-  }, [habits, isDemoMode, sessionUser, refreshGameData, notify]);
+    return {
+      success: true,
+      coins_awarded: coinsAwarded,
+      current_streak: newStreak,
+      longest_streak: newLongest
+    };
+  }, [habits, isDemoMode, sessionUser, fetchHabits, notify]);
+
+  // Backward compatibility alias
+  const checkInHabit = completeHabit;
+
 
   // =====================================================================
   // ACTIONS: REINCARNATION CRISIS TRADEOFF RESOLUTION
@@ -706,7 +774,10 @@ export function useGameState() {
     createTask,
     completeTask,
     deleteTask,
+    fetchHabits,
     createHabit,
+    deleteHabit,
+    completeHabit,
     checkInHabit,
     resolveTradeoff,
     buyShopItem,

@@ -23,7 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
+# Environment variables & Local agent configs
 .env
 .env.local
 .env.*.local
+.agents
