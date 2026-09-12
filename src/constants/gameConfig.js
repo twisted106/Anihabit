@@ -128,3 +128,19 @@ export const calculatePowerScore = (stats) => {
   const { intellect = 10, strength = 10, discipline = 10, willpower = 10 } = stats;
   return Number(((Number(intellect) + Number(strength) + Number(discipline) + Number(willpower)) / 4).toFixed(1));
 };
+
+// =====================================================================
+// MIDNIGHT IST BOUNDARY CALCULATION
+// Indian Standard Time (UTC+5:30) is the canonical tavern daily cycle
+// =====================================================================
+export const getMostRecentMidnightIST = () => {
+  const now = new Date();
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  // Wall time in IST represented as UTC millis
+  const istTime = new Date(now.getTime() + IST_OFFSET_MS);
+  // Roll back to 00:00:00.000 in IST
+  istTime.setUTCHours(0, 0, 0, 0);
+  // Convert back to UTC Date boundary
+  return new Date(istTime.getTime() - IST_OFFSET_MS);
+};
+
