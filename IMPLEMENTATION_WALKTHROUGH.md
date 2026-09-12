@@ -231,3 +231,15 @@ When linking custom Supabase keys (`sb_publishable_...` and `sb_secret_...`):
 - Responsive mobile reflow check (phone viewport $\le 430\text{px}$).
 - Idempotency test: verify that consecutive rapid clicks on `completeHabit` reject subsequent calls without double-paying coins.
 
+---
+
+## 🧹 Phase 15: Clean Header Actions (Removal of Redundant Summon Buttons)
+
+### Objective
+Remove the inline `"Summon Challenge"` and `"Summon Habit"` header buttons from both the Task and Habit panels in [`src/components/GameView.jsx`](./src/components/GameView.jsx) to eliminate visual clutter and ensure challenge creation flows centrally through the primary floating wax-seal button.
+
+### Proposed Changes
+1. In `GameView.jsx` (Mode A: Tasks): Remove the `<button>Summon Challenge</button>` element from the active category header.
+2. In `GameView.jsx` (Mode B: Habits): Remove the `<button>Summon Habit</button>` element from the habit forge header.
+3. Keep the floating wax-seal `+ Add Challenge` button at the bottom-right as the unified, prominent action.
+
