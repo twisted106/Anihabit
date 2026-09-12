@@ -181,3 +181,53 @@ When linking custom Supabase keys (`sb_publishable_...` and `sb_secret_...`):
    - Provided seamless swap capability: if a different Supabase project URL is desired, simply updating `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env` immediately redirects the entire app.
 3. **Zero-Friction Evaluation**:
    - The app actively supports authenticated Supabase sessions alongside the **Instant Demo Hero** mode, guaranteeing hackathon judges and reviewers can evaluate every mechanic (tasks, streaks, battleground strikes, shop, leaderboard) without mandatory email verification hurdles.
+
+---
+
+## 📜 Phase 14: Habit Forge Integration & Tavern Tabletop Habit Mode
+
+### 1. Architectural Directives & Client State (`src/hooks/useGameState.js`)
+- **`fetchHabits`**: Selects all habits for the authenticated user, ordered by creation date.
+- **`createHabit(title, category)`**: Inserts a new habit row with `current_streak = 0`, `longest_streak = 0`, and `last_completed_at = null`. Supports both object `{ title, category }` and positional arguments `(title, category)` for robust invocation.
+- **`deleteHabit(habitId)`**: Deletes the specified habit from Supabase with optimistic UI removal.
+- **`completeHabit(habitId)`**: 
+  - Calls the PostgreSQL `complete_habit` RPC.
+  - **Server-Side Coin Balance**: `coin_balance` in client state is strictly updated from what the server/RPC records, never incremented via arbitrary client math.
+  - **Graceful Daily Lockout Handling**: Detects `"Habit already completed today"` as an expected operational state (not a fatal system crash), triggering a respectful toast notification (`"This habit is already sealed for today! Return tomorrow."`) and cleanly returning `{ success: false, reason: 'already_completed' }`.
+  - **Double-Payment Guard**: Prevents race conditions or double-clicks from awarding unearned currency.
+
+### 2. Tavern Tabletop Toggle Switch (`src/components/GameView.jsx`)
+- **Carved Wooden / Bronze Rocker Switch**:
+  - Replaces generic modern pill/tab bars with a skeuomorphic carved plaque switch (`bg-wood-950`, border `border-amber-700/80`, drop shadows, filigree rivets).
+  - Uses `aria-pressed` and accessible text: `"Switch to Habit view"` / `"Switch to Task view"`.
+  - The Global Reincarnation Pressure Gauge at the summit remains persistently visible and identical in both modes.
+- **Dual Mode Tabletop View**:
+  - **Task Mode**: Retains the 4 category Nemeses confrontation cards (Red Drake, Crypt Warden, Goblin Scout, Wood Wisp) and 24h rolling quest details.
+  - **Habit Mode**: Renders the Habit Forge Ledger alongside the Hero Champion card.
+
+### 3. Habit Mode Tabletop Ledger Layout
+- **Domain Categories**: Academics (Intellect / Book), Fitness (Strength / Sword), Lifestyle (Discipline / Shield), Other (Willpower / Spiral).
+- **Interactive Habit Rows**:
+  - Implemented as strictly semantic `<button>` elements with keyboard focus rings (`focus:ring-2 focus:ring-amber-400`).
+  - Left: Category insignia socket, habit title, and category name.
+  - Center: Streak badge with animated flame (`🔥`) and numerical day tally (`Day 4 Streak · Record: 7`).
+  - Right: Daily tribute seal showing coin bounty $\min(\text{current\_streak} + 1, 10)$ `GP`.
+  - **Sealed for Today State**: When `last_completed_at` matches today's date:
+    - Visibly distinct aged stone background (`bg-[#18110b]`, opacity muted, border `border-stone-800`).
+    - Stamped wax seal checkmark badge (`✔ Sealed for Today · Earned +X GP`).
+    - Disabled attribute and `aria-disabled="true"`.
+
+### 4. 3-Step Add Challenge Flow (`src/components/AddChallengeModal.jsx`)
+- **Step 1 (Challenge Type Selection)**:
+  - Carved choices: **One-off Quest (Task)** vs. **Daily Discipline (Habit)**.
+- **Step 2 (Domain Selection)**:
+  - 2x2 grid of the 4 attribute realms (Academics, Fitness, Lifestyle, Other).
+- **Step 3 (Parameters)**:
+  - **Task**: Title input + 3 Difficulty Chips (Easy, Medium, Hard) with stat & pressure preview + "Inscribe Quest in Tome" submit.
+  - **Habit**: Title input + skips difficulty chips entirely + streak and daily coin economy preview + "Forge Daily Discipline" submit.
+
+### 5. Verification & Accessibility Protocol
+- Full keyboard navigation audit (`Tab`, `Enter`, `Space`) with zero mouse dependency.
+- Responsive mobile reflow check (phone viewport $\le 430\text{px}$).
+- Idempotency test: verify that consecutive rapid clicks on `completeHabit` reject subsequent calls without double-paying coins.
+

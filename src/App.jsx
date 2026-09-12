@@ -48,7 +48,10 @@ export default function App() {
     createTask,
     completeTask,
     deleteTask,
+    fetchHabits,
     createHabit,
+    deleteHabit,
+    completeHabit,
     checkInHabit,
     resolveTradeoff,
     adjustReincarnationPressure,
@@ -121,10 +124,13 @@ export default function App() {
             profile={profile}
             stats={stats}
             tasks={tasks}
+            habits={habits}
             onInspectCard={(card) => setInspectedCard(card)}
             onOpenAddChallenge={() => setIsCreateTaskModalOpen(true)}
             onOpenTradeoffModal={() => setIsTradeoffModalOpen(true)}
             onAdjustPressure={adjustReincarnationPressure}
+            onCompleteHabit={completeHabit}
+            onDeleteHabit={deleteHabit}
           />
         )}
 
@@ -249,6 +255,7 @@ export default function App() {
         isOpen={isCreateTaskModalOpen}
         onClose={() => setIsCreateTaskModalOpen(false)}
         onCreateTask={createTask}
+        onCreateHabit={createHabit}
       />
 
       {/* SCREEN 8 — Crisis Trade-Off Modal (Forced at 100% Pressure) */}
