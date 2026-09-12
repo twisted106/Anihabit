@@ -82,72 +82,88 @@ ALTER TABLE public.items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_inventory ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Users manage their own profile; public can view rank/stats for leaderboard
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
 CREATE POLICY "Users can view their own profile" 
     ON public.profiles FOR SELECT 
     USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile" 
     ON public.profiles FOR UPDATE 
     USING (auth.uid() = id);
 
 -- Stats: Users manage their own stats
+DROP POLICY IF EXISTS "Users can view their own stats" ON public.stats;
 CREATE POLICY "Users can view their own stats" 
     ON public.stats FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own stats" ON public.stats;
 CREATE POLICY "Users can update their own stats" 
     ON public.stats FOR UPDATE 
     USING (auth.uid() = user_id);
 
 -- Tasks: Full CRUD for own tasks
+DROP POLICY IF EXISTS "Users can view their own tasks" ON public.tasks;
 CREATE POLICY "Users can view their own tasks" 
     ON public.tasks FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own tasks" ON public.tasks;
 CREATE POLICY "Users can insert their own tasks" 
     ON public.tasks FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own tasks" ON public.tasks;
 CREATE POLICY "Users can update their own tasks" 
     ON public.tasks FOR UPDATE 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own tasks" ON public.tasks;
 CREATE POLICY "Users can delete their own tasks" 
     ON public.tasks FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- Habits: Full CRUD for own habits
+DROP POLICY IF EXISTS "Users can view their own habits" ON public.habits;
 CREATE POLICY "Users can view their own habits" 
     ON public.habits FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own habits" ON public.habits;
 CREATE POLICY "Users can insert their own habits" 
     ON public.habits FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own habits" ON public.habits;
 CREATE POLICY "Users can update their own habits" 
     ON public.habits FOR UPDATE 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own habits" ON public.habits;
 CREATE POLICY "Users can delete their own habits" 
     ON public.habits FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- Items: Readable by all authenticated users
+DROP POLICY IF EXISTS "Items catalog is viewable by authenticated users" ON public.items;
 CREATE POLICY "Items catalog is viewable by authenticated users" 
     ON public.items FOR SELECT 
     TO authenticated 
     USING (true);
 
 -- User Inventory: Manage own inventory
+DROP POLICY IF EXISTS "Users can view their inventory" ON public.user_inventory;
 CREATE POLICY "Users can view their inventory" 
     ON public.user_inventory FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert into their inventory" ON public.user_inventory;
 CREATE POLICY "Users can insert into their inventory" 
     ON public.user_inventory FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their inventory" ON public.user_inventory;
 CREATE POLICY "Users can update their inventory" 
     ON public.user_inventory FOR UPDATE 
     USING (auth.uid() = user_id);
