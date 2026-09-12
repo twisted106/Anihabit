@@ -236,13 +236,19 @@ export default function CardDetailModal({
           <img 
             src={card.imageSrc || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80'} 
             alt={card.name}
-            className="w-full h-full object-cover object-center"
+            className={`w-full h-full object-cover object-center transition-all duration-300 ${
+              isEnemy && activePendingCount === 0 ? 'grayscale contrast-90 brightness-90' : ''
+            }`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#100b06]/95 via-[#100b06]/30 to-transparent pointer-events-none" />
           
           {/* Active Challenges Count Badge */}
           {isEnemy && (
-            <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-black/85 border border-amber-500/60 text-xs font-cinzel text-amber-300 shadow">
+            <div className={`absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-black/85 border text-xs font-cinzel shadow transition-colors ${
+              activePendingCount === 0 
+                ? 'border-stone-700 text-stone-400' 
+                : 'border-amber-500/60 text-amber-300'
+            }`}>
               {activePendingCount} Active Challenges Pending
             </div>
           )}

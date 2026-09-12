@@ -301,6 +301,7 @@ export default function GameView({
                       categoryBadge={enemy.categoryBadge}
                       statusBadge={`${activeCount} Active`}
                       stats={stats}
+                      isGreyedOut={activeCount === 0}
                       onClick={() => onInspectCard({ 
                         type: 'enemy', 
                         name: enemy.name, 
