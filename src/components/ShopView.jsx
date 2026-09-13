@@ -70,7 +70,7 @@ export default function ShopView({
           return (
             <div 
               key={item.id}
-              className="guardian-card-frame p-3 bg-wood-planks border-3 border-[#201308] relative flex flex-col justify-between"
+              className="guardian-card-frame p-3.5 bg-wood-planks/95 border-3 border-[#201308] shadow-[0_12px_35px_rgba(0,0,0,0.9)] relative flex flex-col justify-between"
             >
               <div>
                 {/* Item Tier & Status Tag */}

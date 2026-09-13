@@ -51,7 +51,7 @@ export default function DashboardView({
       </div>
 
       {/* Main Character Sheet Card (Tavern Hearth Tabletop Plaque) */}
-      <div className="guardian-card-frame p-5 sm:p-8 bg-wood-planks border-4 border-[#201308] relative">
+      <div className="guardian-card-frame p-5 sm:p-8 bg-wood-planks/95 border-4 border-[#201308] shadow-[0_15px_50px_rgba(0,0,0,0.9)] relative">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           
           {/* Left: Character Portrait & Title (Span 4) */}

@@ -25,7 +25,7 @@ export default function LeaderboardView({
     <div className="w-full max-w-4xl mx-auto space-y-4" data-purpose="screen-leaderboard">
       
       {/* Header Banner */}
-      <div className="carved-plaque px-6 py-3 rounded-xl border-2 border-amber-700/80 shadow-2xl flex items-center justify-between">
+      <div className="carved-plaque px-6 py-3.5 rounded-xl border-2 border-amber-700/80 shadow-2xl flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-300 p-0.5 border border-amber-800 shadow">
             <div className="w-full h-full rounded-full bg-stone-950 flex items-center justify-center">
@@ -42,13 +42,13 @@ export default function LeaderboardView({
           </div>
         </div>
 
-        <div className="text-[11px] font-cinzel text-amber-300/80 px-3 py-1 rounded bg-amber-950/80 border border-amber-700/60">
+        <div className="text-[11px] font-cinzel text-amber-300/80 px-3 py-1 rounded bg-amber-950/80 border border-amber-700/60 shadow">
           Your Score: <strong className="text-amber-200 font-bold">{powerScore}</strong>
         </div>
       </div>
 
       {/* Clean Vertical Scrollable Ranked List */}
-      <div className="guardian-card-frame p-4 sm:p-6 bg-wood-planks border-3 border-[#201308]">
+      <div className="guardian-card-frame p-4 sm:p-6 bg-wood-planks/95 border-3 border-[#201308] shadow-[0_12px_40px_rgba(0,0,0,0.85)]">
         <div className="space-y-2.5">
           {leaderboard.length === 0 ? (
             <div className="parchment-surface p-6 rounded-lg text-center text-amber-950 font-cinzel font-bold text-sm">
