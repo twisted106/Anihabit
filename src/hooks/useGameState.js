@@ -215,8 +215,6 @@ export function useGameState() {
   // UI Modals & Notifications
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
-  const [isShopModalOpen, setIsShopModalOpen] = useState(false);
-  const [isLeaderboardModalOpen, setIsLeaderboardModalOpen] = useState(false);
   const [isTradeoffModalOpen, setIsTradeoffModalOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
@@ -933,34 +931,6 @@ export function useGameState() {
   }, [isDemoMode, sessionUser, refreshGameData, notify]);
 
   // =====================================================================
-  // ACTIONS: REINCARNATION TESTING HELPER
-  // =====================================================================
-  const adjustReincarnationPressure = useCallback(async (amount) => {
-    const current = Number(profile?.reincarnation_meter || 0);
-    const newMeter = Math.min(100, Math.max(0, current + amount));
-    setProfile((prev) => ({ ...prev, reincarnation_meter: newMeter }));
-
-    if (isSupabaseConfigured && !isDemoMode && sessionUser) {
-      try {
-        await supabase.from('profiles').update({ reincarnation_meter: newMeter }).eq('id', sessionUser.id);
-      } catch (err) {
-        console.warn('Could not sync demo reincarnation_meter change to database:', err);
-      }
-    }
-
-    if (newMeter >= 100) {
-      setIsTradeoffModalOpen(true);
-      notify('Reincarnation Pressure reached 100%! Crisis initiated!', 'danger', '🔥');
-    } else if (amount > 0) {
-      notify(`Simulated missed task: +${amount}% Pressure (Current: ${newMeter}%)`, 'warning', '⚠️');
-    } else if (amount < 0 && newMeter === 0) {
-      notify('Reincarnation Pressure reset to 0%', 'info', '⚖️');
-    } else {
-      notify(`Reincarnation pressure set to ${newMeter}%`, 'info', '⚖️');
-    }
-  }, [profile?.reincarnation_meter, isSupabaseConfigured, isDemoMode, sessionUser, setIsTradeoffModalOpen, notify]);
-
-  // =====================================================================
   // ACTIONS: COSMETICS SHOP & INVENTORY (Strict Single-Border Exclusivity)
   // =====================================================================
   const buyShopItem = useCallback(async (item) => {
@@ -1163,7 +1133,6 @@ export function useGameState() {
     checkInHabit,
     handleHabitStreakBreak,
     resolveTradeoff,
-    adjustReincarnationPressure,
     buyShopItem,
     toggleEquipItem,
     fetchLeaderboard,
@@ -1177,10 +1146,6 @@ export function useGameState() {
     setIsAuthModalOpen,
     isCreateTaskModalOpen,
     setIsCreateTaskModalOpen,
-    isShopModalOpen,
-    setIsShopModalOpen,
-    isLeaderboardModalOpen,
-    setIsLeaderboardModalOpen,
     isTradeoffModalOpen,
     setIsTradeoffModalOpen,
     toasts,

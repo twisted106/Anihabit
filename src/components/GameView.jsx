@@ -101,7 +101,6 @@ export default function GameView({
   onInspectCard,
   onOpenAddChallenge,
   onOpenTradeoffModal,
-  onAdjustPressure,
   onCompleteHabit,
   onDeleteHabit,
   onOpenCustomizeProfile
@@ -155,7 +154,6 @@ export default function GameView({
       <ReincarnationBar 
         meterValue={profile?.reincarnation_meter || 0}
         onOpenTradeoffModal={onOpenTradeoffModal}
-        onAdjustPressure={onAdjustPressure}
       />
 
       {/* 4. Carved Wooden/Bronze Rocker Mode Toggle Switch */}
