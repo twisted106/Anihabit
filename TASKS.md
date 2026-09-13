@@ -34,6 +34,7 @@
 | **Phase 15: Clean Header Actions (Remove Summon Buttons)** | ✅ DONE | 100% |
 | **Phase 16: Reincarnation Math Resolved** | ✅ DONE | 100% |
 | **Phase 17: Tab-Scoped Challenge Creation** | ✅ DONE | 100% |
+| **Phase 18: Boss Monster Defeat Bounty (50 GP)** | ✅ DONE | 100% |
 
 ---
 
@@ -153,3 +154,18 @@
 | **SCOPE-03** | App State Wiring | Add `challengeModalType` state in `App.jsx` and pass `targetType` prop to `AddChallengeModal` | ✅ `[DONE]` |
 | **SCOPE-04** | Scoped Add Challenge Modal | In `AddChallengeModal.jsx`, bypass archetype selection; start directly at Domain selection locked to the target challenge type | ✅ `[DONE]` |
 | **SCOPE-05** | Build & Flow Verification | Verify build compiles cleanly with `npm run build` | ✅ `[DONE]` |
+
+---
+
+### Phase 18: Boss Monster Defeat Bounty (50 GP Once per Cycle)
+*Awards 50 Gold Coins upon actively conquering all quests in a domain and turning the boss gray, capped strictly at one claim per boss per leaderboard cycle.*
+
+| Task ID | Task Title | Description | Status |
+|---|---|---|:---:|
+| **BOSS-01** | Cycle & Boss Constants | Define `BOSS_DEFEAT_COIN_REWARD = 50`, `getCurrentLeaderboardCycleId()`, and `CATEGORY_BOSS_MAP` in `gameConfig.js` | ✅ `[DONE]` |
+| **BOSS-02** | Postgres Claims Table & RPC | Create `boss_defeat_claims` table with `UNIQUE(user_id, category, cycle_id)` and `claim_boss_defeat_reward` RPC in `schema.sql` | ✅ `[DONE]` |
+| **BOSS-03** | Anti-Loophole Defeat Engine | Update `completeTask` in `useGameState.js` to query/claim 50 GP on first defeat per cycle and award 0 GP on repeat defeats | ✅ `[DONE]` |
+| **BOSS-04** | Tabletop Card & Modal Indicators | Display cycle bounty status ("Claimed" vs "Available on Defeat") on `TabletopCard.jsx` and `CardDetailModal.jsx` | ✅ `[DONE]` |
+| **BOSS-05** | Build & Regression Verification | Verify build passes cleanly with `npm run build` | ✅ `[DONE]` |
+
+

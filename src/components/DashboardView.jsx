@@ -16,7 +16,8 @@ export default function DashboardView({
   profile,
   stats,
   habits = [],
-  equippedTitle = 'Guild Champion'
+  equippedTitle = 'Guild Champion',
+  onOpenCustomizeProfile
 }) {
   const level = profile?.current_level || 1;
   const currentXp = Number(profile?.current_xp || 0);
@@ -56,23 +57,48 @@ export default function DashboardView({
           
           {/* Left: Character Portrait & Title (Span 4) */}
           <div className="md:col-span-4 flex flex-col items-center text-center">
-            <div className="relative w-36 h-36 rounded-2xl overflow-hidden border-4 border-amber-500/80 shadow-2xl bg-stone-950 p-1">
+            <div 
+              className={`relative w-36 h-36 rounded-2xl overflow-hidden border-4 border-amber-500/80 shadow-2xl bg-stone-950 p-1 ${
+                onOpenCustomizeProfile ? 'group cursor-pointer' : ''
+              }`}
+              onClick={onOpenCustomizeProfile}
+              title={onOpenCustomizeProfile ? 'Click to customize character portrait and name' : undefined}
+            >
               <img 
-                src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80" 
-                alt="Character Avatar"
-                className="w-full h-full object-cover rounded-xl"
+                src={profile?.avatar_url || '/images/avatars/knight_protector.jpg'} 
+                alt={profile?.display_name || 'Character Avatar'}
+                className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform"
               />
               <div className="absolute -bottom-2 -right-2 px-3 py-0.5 rounded-full bg-amber-600 border border-yellow-200 text-stone-950 font-cinzel font-black text-xs shadow">
                 LVL {level}
               </div>
+              {onOpenCustomizeProfile && (
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
+                  <span className="text-[10px] font-cinzel font-bold text-amber-200 bg-black/80 px-2 py-1 rounded border border-amber-500/60">
+                    Change Avatar
+                  </span>
+                </div>
+              )}
             </div>
 
             <h3 className="font-cinzel font-bold text-lg text-parchment-200 tracking-wide mt-3">
-              {profile?.email ? profile.email.split('@')[0] : 'Hero'}
+              {profile?.display_name || (profile?.email ? profile.email.split('@')[0] : 'Hero')}
             </h3>
             <span className="px-3 py-0.5 rounded bg-amber-950 border border-amber-600/60 text-xs font-cinzel text-amber-300 uppercase tracking-widest mt-1">
               {equippedTitle}
             </span>
+
+            {onOpenCustomizeProfile && (
+              <button
+                type="button"
+                onClick={onOpenCustomizeProfile}
+                className="mt-3 px-3 py-1 rounded-lg bg-amber-950/80 hover:bg-amber-900 border border-amber-600/60 text-xs font-cinzel text-amber-300 hover:text-amber-100 font-bold transition-all shadow cursor-pointer flex items-center gap-1.5"
+              >
+                <span>✦</span>
+                <span>Customize Champion</span>
+                <span>✦</span>
+              </button>
+            )}
           </div>
 
           {/* Right: Level Progress & Key Metrics (Span 8) */}

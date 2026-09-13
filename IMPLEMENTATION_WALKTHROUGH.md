@@ -297,3 +297,20 @@ Ensure players can only add a Task when on the Task tab (`viewMode === 'tasks'`)
      - For Tasks: Title input + 3 difficulty chips (Easy/Medium/Hard) + Flat reward & pressure preview + "Inscribe Quest in Tome".
      - For Habits: Title input + Guild Coin rules preview + "Forge Daily Discipline".
      - Back navigation returns cleanly to Step 1 (Domain Selection).
+
+---
+
+## 👑 Phase 18: Boss Monster Defeat Bounty (50 GP Once per Cycle)
+
+### Objective
+Award **50 Gold Coins** whenever an adversary boss monster (Red Drake, Crypt Warden, Goblin Scout, Wood Wisp) is defeated and turns gray upon clearing all active quests in that domain, while strictly enforcing a single payout per boss monster per leaderboard cycle to eliminate repeated farming exploits.
+
+### Core Rules & Anti-Loophole Architecture
+1. **Defeat-Driven Only**: No automatic coin handouts occur on cycle reset. Coins are awarded strictly when active quests in a category drop to 0 via active quest completion.
+2. **Strict Single Payout per Boss per Cycle**:
+   - First defeat of a boss in the cycle: Awards 50 Gold Coins, logs claim in `boss_defeat_claims`, and records in state.
+   - Subsequent defeats of that same boss within the same cycle: Awards 0 coins, notifying player that the cycle bounty was already collected.
+3. **Canonical Weekly Cycle**: Cycle IDs are tracked based on IST ISO-8601 week strings (`YYYY-Www`).
+4. **Database & Demo Dual-Authority**:
+   - In Supabase: Atomic validation via `boss_defeat_claims` table with `UNIQUE(user_id, category, cycle_id)` constraint and `claim_boss_defeat_reward` RPC.
+   - In Demo Mode: State and local storage ensure full anti-exploit adherence without requiring an active database connection.
