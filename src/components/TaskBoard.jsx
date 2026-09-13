@@ -120,7 +120,6 @@ export default function TaskBoard({
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
-              <span>{cat.arenaBoss.emoji}</span>
               <span>{cat.name}</span>
               {count > 0 && (
                 <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-black/40 font-mono">

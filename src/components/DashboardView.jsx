@@ -34,9 +34,9 @@ export default function DashboardView({
     <div className="w-full max-w-5xl mx-auto space-y-6" data-purpose="screen-player-dashboard">
       
       {/* Ornate Plaque Header */}
-      <div className="carved-plaque px-6 py-2.5 rounded-xl border-2 border-amber-700/80 shadow-xl flex items-center justify-between">
+      <div className="carved-plaque px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border-2 border-amber-700/80 shadow-xl flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-cinzel font-black text-base sm:text-lg text-amber-200 tracking-wider uppercase drop-shadow">
+          <h2 className="font-cinzel font-black text-sm sm:text-base md:text-lg text-amber-200 tracking-wider uppercase drop-shadow">
             Hero Character Sheet & Progression
           </h2>
           <p className="text-xs font-newsreader text-stone-300 italic">
@@ -44,14 +44,14 @@ export default function DashboardView({
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 bg-amber-950/70 border border-amber-600/60 px-3 py-1.5 rounded-lg text-amber-300">
+        <div className="flex items-center space-x-2 bg-amber-950/70 border border-amber-600/60 px-3 py-1.5 rounded-lg text-amber-300 shrink-0">
           <Trophy className="w-4 h-4 text-amber-400" />
           <span className="font-cinzel text-xs font-bold">Power Score: {powerScore}</span>
         </div>
       </div>
 
       {/* Main Character Sheet Card (Tavern Hearth Tabletop Plaque) */}
-      <div className="guardian-card-frame p-5 sm:p-8 bg-wood-planks/95 border-4 border-[#201308] shadow-[0_15px_50px_rgba(0,0,0,0.9)] relative">
+      <div className="guardian-card-frame p-4 sm:p-8 bg-wood-planks/95 border-4 border-[#201308] shadow-[0_15px_50px_rgba(0,0,0,0.9)] relative">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           
           {/* Left: Character Portrait & Title (Span 4) */}
@@ -107,8 +107,8 @@ export default function DashboardView({
               
               {/* Coin Balance */}
               <div className="bg-wood-900/90 border border-amber-700/60 p-3 rounded-lg flex items-center gap-3 shadow">
-                <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-base">
-                  🪙
+                <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-400/50 flex items-center justify-center">
+                  <Coins className="w-4 h-4 text-amber-300" />
                 </div>
                 <div>
                   <div className="text-[10px] font-cinzel uppercase text-amber-400/80">Coin Balance</div>
@@ -118,8 +118,8 @@ export default function DashboardView({
 
               {/* Current Active Streak */}
               <div className="bg-wood-900/90 border border-emerald-700/60 p-3 rounded-lg flex items-center gap-3 shadow">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-base">
-                  🔥
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center">
+                  <Flame className="w-4 h-4 text-emerald-300" />
                 </div>
                 <div>
                   <div className="text-[10px] font-cinzel uppercase text-emerald-400/80">Active Streak</div>
@@ -129,8 +129,8 @@ export default function DashboardView({
 
               {/* Reincarnation Pressure Ref */}
               <div className="bg-wood-900/90 border border-red-700/60 p-3 rounded-lg flex items-center gap-3 shadow">
-                <div className="w-8 h-8 rounded-full bg-red-500/20 border border-red-400/50 flex items-center justify-center text-base">
-                  ⚖️
+                <div className="w-8 h-8 rounded-full bg-red-500/20 border border-red-400/50 flex items-center justify-center">
+                  <Shield className="w-4 h-4 text-red-300" />
                 </div>
                 <div>
                   <div className="text-[10px] font-cinzel uppercase text-red-400/80">Pressure Meter</div>
