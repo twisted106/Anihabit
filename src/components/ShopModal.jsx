@@ -51,7 +51,7 @@ export default function ShopModal({
                 Cosmetics Bazaar
               </h2>
               <p className="text-xs text-slate-400">
-                Titles, avatar frames, and badges (zero effect on leaderboard)
+                Decorative borders applied to your row on the Grand Leaderboard (zero effect on rank)
               </p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function ShopModal({
             // Inventory Tab
             userInventory.length === 0 ? (
               <div className="text-center py-12 text-slate-500 text-xs">
-                No items in inventory. Complete daily habits to earn coins and purchase titles and frames!
+                No items in inventory. Complete daily habits to earn coins and acquire leaderboard borders!
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
