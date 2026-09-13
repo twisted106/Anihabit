@@ -33,10 +33,7 @@
 | **Phase 14: Habit Forge & Tabletop Habit Mode** | ✅ DONE | 100% |
 | **Phase 15: Clean Header Actions (Remove Summon Buttons)** | ✅ DONE | 100% |
 | **Phase 16: Reincarnation Math Resolved** | ✅ DONE | 100% |
-
-
-
-
+| **Phase 17: Tab-Scoped Challenge Creation** | ✅ DONE | 100% |
 
 ---
 
@@ -144,5 +141,15 @@
 | **MATH-04** | PostgreSQL Schema Alignment | Mirror exact flat math and streak break formula in `supabase/schema.sql` RPCs | ✅ `[DONE]` |
 | **MATH-05** | Build & Regression Verification | Verify build passes cleanly with zero errors (`npm run build`) | ✅ `[DONE]` |
 
+---
 
+### Phase 17: Tab-Scoped Challenge Creation (Strict Task vs. Habit Modal Flow)
+*Enforces strict context separation so players can only create Tasks in the Task tab and only create Habits in the Habit tab.*
 
+| Task ID | Task Title | Description | Status |
+|---|---|---|:---:|
+| **SCOPE-01** | Tab Context Propagation | Update `GameView.jsx` floating action button and empty habit ledger button to pass `'task'` or `'habit'` based on `viewMode` | ✅ `[DONE]` |
+| **SCOPE-02** | Dynamic Button Labels | Display "Add Quest" in Task mode and "Forge Habit" in Habit mode on the floating wax-seal button | ✅ `[DONE]` |
+| **SCOPE-03** | App State Wiring | Add `challengeModalType` state in `App.jsx` and pass `targetType` prop to `AddChallengeModal` | ✅ `[DONE]` |
+| **SCOPE-04** | Scoped Add Challenge Modal | In `AddChallengeModal.jsx`, bypass archetype selection; start directly at Domain selection locked to the target challenge type | ✅ `[DONE]` |
+| **SCOPE-05** | Build & Flow Verification | Verify build compiles cleanly with `npm run build` | ✅ `[DONE]` |

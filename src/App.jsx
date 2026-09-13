@@ -76,6 +76,9 @@ export default function App() {
   // Inspected Card State (SCREEN 3 Card Detail Modal)
   const [inspectedCard, setInspectedCard] = useState(null);
 
+  // Challenge Modal Target Type ('task' | 'habit')
+  const [challengeModalType, setChallengeModalType] = useState('task');
+
   // Audio mute state
   const [isMuted, setIsMuted] = useState(false);
 
@@ -126,7 +129,10 @@ export default function App() {
             tasks={tasks}
             habits={habits}
             onInspectCard={(card) => setInspectedCard(card)}
-            onOpenAddChallenge={() => setIsCreateTaskModalOpen(true)}
+            onOpenAddChallenge={(type = 'task') => {
+              setChallengeModalType(type);
+              setIsCreateTaskModalOpen(true);
+            }}
             onOpenTradeoffModal={() => setIsTradeoffModalOpen(true)}
             onAdjustPressure={adjustReincarnationPressure}
             onCompleteHabit={completeHabit}
@@ -201,12 +207,12 @@ export default function App() {
           <span className="text-[9px] font-cinzel font-bold text-emerald-300/90 mt-0.5">Hero</span>
         </button>
 
-        {/* Habit / Task (Game View) Medallion */}
+        {/* Habit / Task Medallion */}
         <button
           type="button"
           onClick={() => handleTabSwitch('gameview')}
           className="flex flex-col items-center focus:outline-none"
-          aria-label="Tabletop Game View"
+          aria-label="Tabletop Arena"
         >
           <div className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-transform ${
             activeTab === 'gameview' ? 'bg-amber-500 border-yellow-100 scale-115 shadow-[0_0_12px_rgba(245,180,40,0.8)]' : 'bg-stone-900 border-amber-900 text-stone-400'
@@ -258,6 +264,7 @@ export default function App() {
       <AddChallengeModal 
         isOpen={isCreateTaskModalOpen}
         onClose={() => setIsCreateTaskModalOpen(false)}
+        targetType={challengeModalType}
         onCreateTask={createTask}
         onCreateHabit={createHabit}
       />

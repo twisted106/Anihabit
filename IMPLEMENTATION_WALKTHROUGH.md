@@ -274,3 +274,26 @@ Incorporate the authoritative mathematical specification from [`reincarnation-ma
 - `src/components/CardDetailModal.jsx`, `src/components/AddChallengeModal.jsx`, `src/components/CreateTaskModal.jsx`, `src/components/ReincarnationBar.jsx`: Update badges and UI preview calculations.
 - `supabase/schema.sql`: Update `complete_task`, `check_expired_tasks`, and habit streak break procedures.
 
+---
+
+## 🔒 Phase 17: Tab-Scoped Challenge Creation (Strict Task vs. Habit Modal Flow)
+
+### Objective
+Ensure players can only add a Task when on the Task tab (`viewMode === 'tasks'`) and can only add a Habit when on the Habit tab (`viewMode === 'habits'`), preventing accidental cross-creation or switching challenge archetypes out of context.
+
+### Architectural & UI Design
+1. **Dynamic Floating Action Button (`src/components/GameView.jsx`)**:
+   - In Task mode (`viewMode === 'tasks'`), displays **"Add Quest"** with `aria-label="Add a new quest"` and invokes `onOpenAddChallenge('task')`.
+   - In Habit mode (`viewMode === 'habits'`), displays **"Forge Habit"** with `aria-label="Inscribe a new daily habit"` and invokes `onOpenAddChallenge('habit')`.
+   - Empty state button in Habit mode (`+ Inscribe First Discipline`) explicitly invokes `onOpenAddChallenge('habit')`.
+2. **Context Routing in App (`src/App.jsx`)**:
+   - Manages `challengeModalType` state (`'task' | 'habit'`).
+   - Receives target type from `onOpenAddChallenge(type)` and passes `targetType={challengeModalType}` to `<AddChallengeModal />`.
+3. **Tab-Scoped Wizard Flow (`src/components/AddChallengeModal.jsx`)**:
+   - Accepts `targetType` prop and locks `challengeType` strictly to that type.
+   - Bypasses the legacy archetype selection screen entirely.
+   - **Step 1: Choose Domain**: Select one of 4 category realms (Academics, Fitness, Lifestyle, Other). No "Back to Archetype" button exists.
+   - **Step 2: Inscription & Configuration**:
+     - For Tasks: Title input + 3 difficulty chips (Easy/Medium/Hard) + Flat reward & pressure preview + "Inscribe Quest in Tome".
+     - For Habits: Title input + Guild Coin rules preview + "Forge Daily Discipline".
+     - Back navigation returns cleanly to Step 1 (Domain Selection).

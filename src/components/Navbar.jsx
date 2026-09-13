@@ -106,13 +106,13 @@ export default function Navbar({
           </span>
         </button>
 
-        {/* 3. Habit / Task (Game View) Medallion */}
+        {/* 3. Habit / Task Medallion */}
         <button
           type="button"
           onClick={() => onSwitchTab('gameview')}
           className="medallion-btn group focus:outline-none focus-visible:outline-none cursor-pointer"
           title="Habit & Task Tabletop Arena"
-          aria-label="View Game Tabletop"
+          aria-label="View Tabletop Arena"
           aria-current={activeTab === 'gameview' ? 'page' : undefined}
         >
           <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full p-1 border-2 transition-all flex items-center justify-center group-focus-visible:ring-2 group-focus-visible:ring-amber-400 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-[#160b05] ${

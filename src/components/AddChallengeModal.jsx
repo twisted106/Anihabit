@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { X, BookOpen, Dumbbell, Sparkles, Flame, ArrowLeft, Scroll, Coins, Shield } from 'lucide-react';
-import { DIFFICULTY_CONFIG, CATEGORIES } from '../constants/gameConfig';
+import React, { useState, useEffect } from 'react';
+import { X, BookOpen, Dumbbell, Sparkles, Flame, ArrowLeft, Coins } from 'lucide-react';
+import { DIFFICULTY_CONFIG } from '../constants/gameConfig';
 
 /**
- * SCREEN 4 — Add Challenge Flow (3 Steps)
- * Step 1: Challenge Type (Task / 24h Rolling Quest vs. Habit / Daily Recurring Discipline)
- * Step 2: 2x2 grid of category cards (Academics, Fitness, Lifestyle, Other)
- * Step 3:
- *   - If Task: Title input + 3 difficulty chips (Easy/Medium/Hard) + wax-seal submit button
+ * SCREEN 4 — Add Challenge Flow (Scoped by Active View Tab)
+ * Tab-scoped 2-step flow:
+ * Step 1: Choose Domain (Academics, Fitness, Lifestyle, Other)
+ * Step 2:
+ *   - If Task: Title input + 3 difficulty chips (Easy/Medium/Hard) + Reward/Penalty Preview + wax-seal submit button
  *   - If Habit: Title input + skips difficulty chips entirely + streak/coin reward preview + wax-seal submit button
  */
 
@@ -53,26 +53,33 @@ const CATEGORY_ITEMS = [
 export default function AddChallengeModal({
   isOpen,
   onClose,
+  targetType = 'task', // 'task' | 'habit'
   onCreateTask,
   onCreateHabit
 }) {
   const [step, setStep] = useState(1);
-  const [challengeType, setChallengeType] = useState('task'); // 'task' | 'habit'
+  const [challengeType, setChallengeType] = useState(targetType);
   const [selectedCategory, setSelectedCategory] = useState('Fitness');
   const [title, setTitle] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState('Medium');
   const [errorMsg, setErrorMsg] = useState('');
 
-  if (!isOpen) return null;
+  // Reset and synchronize when modal opens or targetType changes
+  useEffect(() => {
+    if (isOpen) {
+      setChallengeType(targetType || 'task');
+      setStep(1);
+      setTitle('');
+      setSelectedDifficulty('Medium');
+      setErrorMsg('');
+    }
+  }, [isOpen, targetType]);
 
-  const handleTypeSelect = (type) => {
-    setChallengeType(type);
-    setStep(2);
-  };
+  if (!isOpen) return null;
 
   const handleCategorySelect = (catKey) => {
     setSelectedCategory(catKey);
-    setStep(3);
+    setStep(2);
   };
 
   const handleSubmit = (e) => {
@@ -137,99 +144,18 @@ export default function AddChallengeModal({
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-[#170c05] via-[#221208] to-[#170c05] rounded-xl py-3 px-4 text-center mb-4 border border-amber-700/50 shadow-inner">
           <h2 id="add-challenge-title" className="font-cinzel font-black text-base sm:text-lg text-[#faecd1] uppercase tracking-wider drop-shadow">
-            {step === 1 && 'Step 1: Select Challenge Archetype'}
-            {step === 2 && `Step 2: Choose ${challengeType === 'task' ? 'Quest' : 'Habit'} Domain`}
-            {step === 3 && (challengeType === 'task' ? `Step 3: Forge ${selectedCategory} Quest` : `Step 3: Inscribe ${selectedCategory} Daily Discipline`)}
+            {step === 1 && `Step 1: Choose ${challengeType === 'task' ? 'Quest' : 'Habit'} Domain`}
+            {step === 2 && (challengeType === 'task' ? `Step 2: Forge ${selectedCategory} Quest` : `Step 2: Inscribe ${selectedCategory} Daily Discipline`)}
           </h2>
           <p className="text-[11px] font-newsreader text-amber-400/80 italic mt-0.5">
-            {step === 1 && 'Decide between a one-off quest or an ongoing daily ritual'}
-            {step === 2 && 'Select which core attribute realm this endeavor will fortify'}
-            {step === 3 && (challengeType === 'task' ? 'Balance challenge difficulty against potential glory and peril' : 'Habits yield escalating gold coin tributes for consecutive streaks')}
+            {step === 1 && 'Select which core attribute realm this endeavor will fortify'}
+            {step === 2 && (challengeType === 'task' ? 'Balance challenge difficulty against potential glory and peril' : 'Habits yield escalating gold coin tributes for consecutive streaks')}
           </p>
         </div>
 
-        {/* STEP 1: Choose Challenge Type (Task vs Habit) */}
+        {/* STEP 1: 2x2 Grid of Category Cards */}
         {step === 1 && (
           <div className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              
-              {/* Option A: One-off Quest (Task) */}
-              <button
-                type="button"
-                onClick={() => handleTypeSelect('task')}
-                className="p-4 rounded-xl text-left border-2 border-amber-600/70 bg-gradient-to-b from-[#25150a] to-[#160b05] hover:bg-gradient-to-b hover:from-[#2d180b] hover:to-[#1a0c06] hover:border-amber-400 hover:shadow-[0_0_20px_rgba(245,180,40,0.25)] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all cursor-pointer group flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="p-2 rounded-lg bg-amber-950/80 text-amber-300 border border-amber-600/40">
-                      <Scroll className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-cinzel font-bold text-amber-300 uppercase px-2 py-0.5 rounded bg-amber-950 border border-amber-700/50">
-                      24h Deadline
-                    </span>
-                  </div>
-
-                  <h3 className="font-cinzel font-bold text-base text-parchment-100 group-hover:text-amber-300 transition-colors">
-                    One-off Quest (Task)
-                  </h3>
-                  <p className="text-xs font-newsreader text-stone-300 mt-1.5 leading-relaxed">
-                    A singular objective with a 24-hour rolling timer. Conquering it earns direct XP and Attribute stats; letting it expire imposes stat loss and +15% Reincarnation Pressure.
-                  </p>
-                </div>
-
-                <div className="mt-4 pt-2 border-t border-amber-900/50 flex items-center justify-between text-[11px] font-cinzel text-amber-400/90">
-                  <span>Earns XP & Stats</span>
-                  <span>Select →</span>
-                </div>
-              </button>
-
-              {/* Option B: Daily Recurring Discipline (Habit) */}
-              <button
-                type="button"
-                onClick={() => handleTypeSelect('habit')}
-                className="p-4 rounded-xl text-left border-2 border-emerald-600/70 bg-gradient-to-b from-[#14261b] to-[#0c1811] hover:bg-gradient-to-b hover:from-[#1a3123] hover:to-[#0f1f16] hover:border-emerald-400 hover:shadow-[0_0_20px_rgba(52,211,153,0.25)] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all cursor-pointer group flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="p-2 rounded-lg bg-emerald-950/80 text-emerald-300 border border-emerald-600/40">
-                      <Flame className="w-5 h-5" />
-                    </div>
-                    <span className="text-[10px] font-cinzel font-bold text-emerald-300 uppercase px-2 py-0.5 rounded bg-emerald-950 border border-emerald-700/50">
-                      Daily Streak
-                    </span>
-                  </div>
-
-                  <h3 className="font-cinzel font-bold text-base text-parchment-100 group-hover:text-emerald-300 transition-colors">
-                    Daily Discipline (Habit)
-                  </h3>
-                  <p className="text-xs font-newsreader text-stone-300 mt-1.5 leading-relaxed">
-                    A recurring daily ritual. Serves as the <span className="text-amber-300 font-semibold">sole source of Gold Coins</span> in the realm (Day 1 = 1 GP ... up to 10 GP max). Safe from expiration pressure.
-                  </p>
-                </div>
-
-                <div className="mt-4 pt-2 border-t border-emerald-900/50 flex items-center justify-between text-[11px] font-cinzel text-emerald-400/90">
-                  <span>Sole Source of Coins</span>
-                  <span>Select →</span>
-                </div>
-              </button>
-
-            </div>
-          </div>
-        )}
-
-        {/* STEP 2: 2x2 Grid of Category Cards */}
-        {step === 2 && (
-          <div className="space-y-3">
-            {/* Back Button */}
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="text-xs font-cinzel text-amber-400/80 hover:text-amber-200 flex items-center gap-1 focus:outline-none cursor-pointer mb-2"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Archetype</span>
-            </button>
-
             <div className="grid grid-cols-2 gap-3">
               {CATEGORY_ITEMS.map((cat) => {
                 const IconComponent = cat.icon;
@@ -262,13 +188,13 @@ export default function AddChallengeModal({
           </div>
         )}
 
-        {/* STEP 3: Form Configuration (Different for Task vs Habit) */}
-        {step === 3 && (
+        {/* STEP 2: Form Configuration (Different for Task vs Habit) */}
+        {step === 2 && (
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Back Button */}
             <button
               type="button"
-              onClick={() => setStep(2)}
+              onClick={() => setStep(1)}
               className="text-xs font-cinzel text-amber-400/80 hover:text-amber-200 flex items-center gap-1 focus:outline-none cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
