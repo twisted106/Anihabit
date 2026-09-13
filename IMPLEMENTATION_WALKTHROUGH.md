@@ -243,3 +243,34 @@ Remove the inline `"Summon Challenge"` and `"Summon Habit"` header buttons from 
 2. In `GameView.jsx` (Mode B: Habits): Remove the `<button>Summon Habit</button>` element from the habit forge header.
 3. Keep the floating wax-seal `+ Add Challenge` button at the bottom-right as the unified, prominent action.
 
+---
+
+## ⚖️ Phase 16: Reincarnation Math Resolved (Flat Rewards, Pressure Dynamics & Streak Breaks)
+
+### Objective
+Incorporate the authoritative mathematical specification from [`reincarnation-math-resolved.md`](./reincarnation-math-resolved.md), fully retiring legacy percentage multipliers (1.0x / 1.8x / 3.0x) and $x=15\% / y=8\%$ placeholders with exact flat values across client and database layers.
+
+### Authoritative Mathematical Specification
+1. **Task Completion (Flat Gains, No Multipliers)**:
+   - Easy: `+1 XP`, `+1 Category Stat`, `-1 Reincarnation Bar`
+   - Medium: `+2 XP`, `+2 Category Stat`, `-2 Reincarnation Bar`
+   - Hard: `+3 XP`, `+3 Category Stat`, `-3 Reincarnation Bar`
+2. **Task Expiration / Failure (Uncompleted Tasks)**:
+   - Hard: `-1 Category Stat`, `+8 Reincarnation Bar`
+   - Medium: `-2 Category Stat`, `+9 Reincarnation Bar`
+   - Easy: `-3 Category Stat`, `+10 Reincarnation Bar`
+3. **Habit Forge Dynamics**:
+   - Habit Completion: `-2 Reincarnation Bar`, awards `min(streak, 10)` Gold Coins (GP).
+   - Habit Failure / Streak Break: `+10 Reincarnation Bar`, coin penalty:
+     $$\text{remaining\_coins} = \text{original\_coins} \times (1 - 0.10 \times \text{number\_of\_habits\_broken\_that\_day})$$
+4. **Crisis Trade-off (At 100 Pressure)**:
+   - Option A: Sacrifice 25% across all 4 category stats (`intellect`, `strength`, `discipline`, `willpower`).
+   - Option B: Sacrifice 50% of gold coin vault.
+   - Meter resets to 0.
+
+### Touchpoints Across Codebase
+- `src/constants/gameConfig.js`: Update `DIFFICULTY_CONFIG`, pressure fail/relief constants, and streak break formula.
+- `src/hooks/useGameState.js`: Align `completeTask`, `completeHabit`, and streak break handling.
+- `src/components/CardDetailModal.jsx`, `src/components/AddChallengeModal.jsx`, `src/components/CreateTaskModal.jsx`, `src/components/ReincarnationBar.jsx`: Update badges and UI preview calculations.
+- `supabase/schema.sql`: Update `complete_task`, `check_expired_tasks`, and habit streak break procedures.
+

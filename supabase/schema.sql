@@ -243,15 +243,21 @@ BEGIN
         RAISE EXCEPTION 'Task already completed';
     END IF;
 
-    -- Difficulty Multipliers
-    IF v_difficulty = 'Medium' THEN
-        v_multiplier := 1.8;
-    ELSIF v_difficulty = 'Hard' THEN
-        v_multiplier := 3.0;
+    -- Flat Gain, No Multiplier: Easy (+1), Medium (+2), Hard (+3)
+    -- Pressure Relief: Easy (-1), Medium (-2), Hard (-3)
+    IF v_difficulty = 'Hard' THEN
+        v_xp_gain := 3;
+        v_stat_gain := 3;
+        v_reduce_on_complete := 3;
+    ELSIF v_difficulty = 'Medium' THEN
+        v_xp_gain := 2;
+        v_stat_gain := 2;
+        v_reduce_on_complete := 2;
+    ELSE
+        v_xp_gain := 1;
+        v_stat_gain := 1;
+        v_reduce_on_complete := 1;
     END IF;
-
-    v_xp_gain := round(v_base_xp * v_multiplier);
-    v_stat_gain := round(v_base_stat * v_multiplier);
 
     -- Mark task completed
     UPDATE public.tasks
@@ -268,11 +274,6 @@ BEGIN
 
     IF v_uncompleted_in_category = 0 THEN
         v_is_all_clear := TRUE;
-        -- Bonus scaled by sum of difficulty of cleared tasks in category
-        v_clear_bonus_xp := 25 * v_multiplier;
-        v_clear_bonus_stat := 5 * v_multiplier;
-        v_xp_gain := v_xp_gain + v_clear_bonus_xp;
-        v_stat_gain := v_stat_gain + v_clear_bonus_stat;
     END IF;
 
     -- Update Category Stat
@@ -382,41 +383,69 @@ BEGIN
         last_completed_at = timezone('utc'::text, now())
     WHERE id = p_habit_id;
 
-    -- Award coins to profile (Habits are the SOLE source of coins)
+    -- Award coins to profile and relieve Reincarnation pressure (-2, floored at 0)
     UPDATE public.profiles
-    SET coin_balance = coin_balance + v_coins_awarded
+    SET coin_balance = coin_balance + v_coins_awarded,
+        reincarnation_meter = GREATEST(0, reincarnation_meter - 2)
     WHERE id = v_user_id;
 
     RETURN jsonb_build_object(
         'success', true,
         'coins_awarded', v_coins_awarded,
         'current_streak', v_current_streak,
-        'longest_streak', v_longest_streak
+        'longest_streak', v_longest_streak,
+        'reincarnation_reduced_by', 2
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
--- 3. HABIT STREAK BREAK PENALTY STUB
--- Note: This is an intentional placeholder for future drop-in redesign
-CREATE OR REPLACE FUNCTION public.stub_handle_habit_streak_break(p_habit_id UUID)
-RETURNS VOID AS $$
+-- 3. HABIT STREAK BREAK PENALTY
+-- Adds +10 Reincarnation Bar and deducts coins linearly based on broken count
+-- remaining_coins = original_coins * (1 - 0.10 * number_of_habits_broken_that_day)
+CREATE OR REPLACE FUNCTION public.stub_handle_habit_streak_break(p_habit_id UUID, p_broken_count INT DEFAULT 1)
+RETURNS JSONB AS $$
+DECLARE
+    v_user_id UUID;
+    v_coin_retention NUMERIC;
 BEGIN
-    -- [INTENTIONAL PLACEHOLDER]:
-    -- Streak-break penalty logic is currently deferred and being designed separately.
-    -- Stored procedure stub exists to preserve API surface without future schema changes.
-    NULL;
+    v_user_id := auth.uid();
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'Not authenticated';
+    END IF;
+
+    -- Reset streak on the habit
+    UPDATE public.habits
+    SET current_streak = 0
+    WHERE id = p_habit_id AND user_id = v_user_id;
+
+    -- Linear coin retention: GREATEST(0.0, 1.0 - (0.10 * p_broken_count))
+    v_coin_retention := GREATEST(0.0, 1.0 - (0.10 * COALESCE(p_broken_count, 1)));
+
+    UPDATE public.profiles
+    SET coin_balance = round(coin_balance * v_coin_retention),
+        reincarnation_meter = LEAST(100, reincarnation_meter + 10)
+    WHERE id = v_user_id;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'reincarnation_added', 10,
+        'coin_retention_rate', v_coin_retention
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
--- 4. CHECK EXPIRED TASKS RPC (Applies penalty + adds x to reincarnation bar)
+-- 4. CHECK EXPIRED TASKS RPC (Reverse-scaled stat penalty + normal-scaled reincarnation pressure)
+-- Easy: -3 stat / +8 pressure
+-- Medium: -2 stat / +9 pressure
+-- Hard: -1 stat / +10 pressure
 CREATE OR REPLACE FUNCTION public.check_expired_tasks()
 RETURNS JSONB AS $$
 DECLARE
     v_user_id UUID;
     v_task RECORD;
-    v_receive_on_fail NUMERIC := 15; -- x (x > y enforced: 15 > 8)
+    v_receive_on_fail NUMERIC;
     v_penalty NUMERIC;
     v_expired_count INT := 0;
     v_reincarnation_increase NUMERIC := 0;
@@ -434,16 +463,23 @@ BEGIN
           AND deadline_at < timezone('utc'::text, now())
     LOOP
         v_expired_count := v_expired_count + 1;
-        v_reincarnation_increase := v_reincarnation_increase + v_receive_on_fail;
 
-        -- Difficulty scaled penalty to category stat
+        -- Reverse-scaled stat penalty & reverse-scaled reincarnation pressure:
+        -- Hard not complete: -1 stat, +8 pressure
+        -- Medium not complete: -2 stat, +9 pressure
+        -- Easy not complete: -3 stat, +10 pressure
         IF v_task.difficulty = 'Hard' THEN
-            v_penalty := 7;
+            v_penalty := 1;
+            v_receive_on_fail := 8;
         ELSIF v_task.difficulty = 'Medium' THEN
-            v_penalty := 4;
-        ELSE
             v_penalty := 2;
+            v_receive_on_fail := 9;
+        ELSE
+            v_penalty := 3;
+            v_receive_on_fail := 10;
         END IF;
+
+        v_reincarnation_increase := v_reincarnation_increase + v_receive_on_fail;
 
         IF v_task.category = 'Academics' THEN
             UPDATE public.stats SET intellect = GREATEST(0, intellect - v_penalty) WHERE user_id = v_user_id;

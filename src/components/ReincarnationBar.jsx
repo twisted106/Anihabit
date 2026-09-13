@@ -52,14 +52,56 @@ export default function ReincarnationBar({
                 🧪 Demo Test:
               </span>
 
-              {/* Button 1: Simulate Missed Task (+15%) */}
+              {/* Simulate Task Fail: Hard (+8), Medium (+9), Easy (+10) */}
               <button
                 type="button"
-                onClick={() => onAdjustPressure(RECEIVE_ON_FAIL)}
-                className="px-2 py-0.5 rounded bg-red-950 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/70 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title={`Simulate a missed task (+${RECEIVE_ON_FAIL}% Pressure)`}
+                onClick={() => onAdjustPressure(8)}
+                className="px-1.5 py-0.5 rounded bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title="Simulate Hard task fail (+8 Pressure)"
               >
-                +{RECEIVE_ON_FAIL}% Miss
+                +8 (Hard Miss)
+              </button>
+              <button
+                type="button"
+                onClick={() => onAdjustPressure(9)}
+                className="px-1.5 py-0.5 rounded bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/60 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title="Simulate Medium task fail (+9 Pressure)"
+              >
+                +9 (Med Miss)
+              </button>
+              <button
+                type="button"
+                onClick={() => onAdjustPressure(10)}
+                className="px-1.5 py-0.5 rounded bg-red-950 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/70 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title="Simulate Easy task fail (+10 Pressure)"
+              >
+                +10 (Easy Miss)
+              </button>
+
+              {/* Simulate Task Complete (-3, -2, -1) */}
+              <button
+                type="button"
+                onClick={() => onAdjustPressure(-3)}
+                className="px-1.5 py-0.5 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/70 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title="Simulate Hard task complete (-3 Pressure)"
+              >
+                -3 (Hard Win)
+              </button>
+              <button
+                type="button"
+                onClick={() => onAdjustPressure(-2)}
+                className="px-1.5 py-0.5 rounded bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/60 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title="Simulate Medium task complete (-2 Pressure)"
+              >
+                -2 (Med Win)
+              </button>
+              <button
+                type="button"
+                onClick={() => onAdjustPressure(-1)}
+                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                title="Simulate Easy task complete (-1 Pressure)"
+              >
+                -1 (Easy Win)
               </button>
 
               {/* Button 2: Immediate 100% Crisis Trigger */}
@@ -127,7 +169,7 @@ export default function ReincarnationBar({
         <span className="flex items-center gap-1">
           <Info className="w-3 h-3 text-amber-500 inline" />
           <span>
-            <strong className="text-red-300">+{RECEIVE_ON_FAIL}%</strong> on missed task · <strong className="text-emerald-300">-{REDUCE_ON_COMPLETE}%</strong> on completed task
+            <strong className="text-red-300">+8 to +10</strong> on missed task · <strong className="text-emerald-300">-1 to -3</strong> on completed task
           </span>
         </span>
         <span className="text-stone-400 hidden sm:inline">

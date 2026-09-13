@@ -12,6 +12,9 @@ import {
   REDUCE_ON_COMPLETE, 
   REINCARNATION_MAX,
   MAX_HABIT_DAILY_COINS,
+  HABIT_PRESSURE_RELIEF,
+  HABIT_STREAK_BREAK_PRESSURE,
+  calculateStreakBreakCoinRetention,
   REINCARNATION_STAT_SACRIFICE_PERCENT,
   REINCARNATION_COIN_SACRIFICE_PERCENT,
   DIFFICULTY_CONFIG,
@@ -379,6 +382,7 @@ export function useGameState() {
     const diffConfig = DIFFICULTY_CONFIG[targetTask.difficulty] || DIFFICULTY_CONFIG.Easy;
     const xpGained = diffConfig.xp;
     const statGained = diffConfig.stat;
+    const pressureRelief = diffConfig.pressureRelief || 1;
     const statKey = CATEGORIES[targetTask.category]?.stat || 'intellect';
 
     // Check if category will be all clear after completing this task
@@ -391,13 +395,14 @@ export function useGameState() {
     let totalStatGain = statGained;
 
     if (isCategoryAllClear) {
-      const clearBonusXp = Math.round(25 * diffConfig.multiplier);
-      const clearBonusStat = Math.round(5 * diffConfig.multiplier);
-      totalXpGain += clearBonusXp;
-      totalStatGain += clearBonusStat;
       confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } });
-      notify(`CATEGORY ALL-CLEAR! ${targetTask.category} realm liberated! +${clearBonusXp} bonus XP!`, 'gold', '🌟');
+      notify(`CATEGORY ALL-CLEAR! ${targetTask.category} realm liberated!`, 'gold', '🌟');
     }
+
+    // Target Reincarnation meter after strictly decreasing by difficulty relief:
+    // Easy (-1), Medium (-2), Hard (-3)
+    const currentMeter = Number(profile?.reincarnation_meter || 0);
+    const targetMeter = Math.max(0, currentMeter - pressureRelief);
 
     // Call server-side RPC if connected
     if (isSupabaseConfigured && !isDemoMode && sessionUser) {
@@ -408,11 +413,27 @@ export function useGameState() {
           notify('Server error completing task', 'danger', '❌');
           return;
         }
-        if (data) {
-          refreshGameData(sessionUser.id);
-          notify(`Task Completed! +${data.xp_gained} XP, +${data.stat_gained} ${targetTask.category} Stat`, 'success', '✨');
-          return;
+
+        // Overwrite cloud profile's reincarnation_meter to guarantee exact flat decrement (-1, -2, -3)
+        try {
+          await supabase
+            .from('profiles')
+            .update({ reincarnation_meter: targetMeter })
+            .eq('id', sessionUser.id);
+        } catch (updateErr) {
+          console.warn('Could not sync reincarnation_meter directly to profiles table:', updateErr);
         }
+
+        await refreshGameData(sessionUser.id);
+
+        // Force local state to targetMeter
+        setProfile((prev) => ({
+          ...prev,
+          reincarnation_meter: targetMeter
+        }));
+
+        notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success', '✨');
+        return;
       } catch (err) {
         console.error('complete_task error:', err);
       }
@@ -453,13 +474,56 @@ export function useGameState() {
         ...prev,
         current_level: currentLevel,
         current_xp: currentXp,
-        // Relieve reincarnation meter by y (floor at 0)
-        reincarnation_meter: Math.max(0, prev.reincarnation_meter - REDUCE_ON_COMPLETE)
+        // Relieve reincarnation meter strictly by task difficulty relief: Easy (-1), Medium (-2), Hard (-3)
+        reincarnation_meter: targetMeter
       };
     });
 
-    notify(`+${totalXpGain} XP | +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Reincarnation pressure -${REDUCE_ON_COMPLETE}%`, 'success', '🛡️');
-  }, [tasks, isDemoMode, sessionUser, refreshGameData, notify]);
+    notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success', '🛡️');
+  }, [tasks, profile?.reincarnation_meter, isDemoMode, sessionUser, refreshGameData, notify]);
+
+  // Expire / Fail Task (When task is not completed / 24h expires)
+  // Reincarnation Bar increased by: Easy (+8), Medium (+9), Hard (+10)
+  // Category Stat penalized by: Easy (-3), Medium (-2), Hard (-1)
+  const failTask = useCallback(async (taskId) => {
+    const targetTask = tasks.find((t) => t.id === taskId);
+    if (!targetTask || targetTask.is_completed) return;
+
+    const diffConfig = DIFFICULTY_CONFIG[targetTask.difficulty] || DIFFICULTY_CONFIG.Easy;
+    const statKey = CATEGORIES[targetTask.category]?.stat || 'intellect';
+    const statPenalty = diffConfig.penalty; // Easy: 3, Medium: 2, Hard: 1
+    const pressureIncrease = diffConfig.pressureFail; // Easy: 8, Medium: 9, Hard: 10
+
+    const currentMeter = Number(profile?.reincarnation_meter || 0);
+    const targetMeter = Math.min(100, currentMeter + pressureIncrease);
+
+    // Remove task from active list
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+
+    // Deduct category stat with floor of 0
+    setStats((prev) => ({
+      ...prev,
+      [statKey]: Math.max(0, (prev[statKey] || 10) - statPenalty)
+    }));
+
+    // Increase Reincarnation Bar strictly by +8, +9, or +10
+    setProfile((prev) => ({
+      ...prev,
+      reincarnation_meter: targetMeter
+    }));
+
+    if (isSupabaseConfigured && !isDemoMode && sessionUser) {
+      try {
+        await supabase.from('tasks').delete().eq('id', taskId);
+        await supabase.from('stats').update({ [statKey]: Math.max(0, (stats[statKey] || 10) - statPenalty) }).eq('user_id', sessionUser.id);
+        await supabase.from('profiles').update({ reincarnation_meter: targetMeter }).eq('id', sessionUser.id);
+      } catch (err) {
+        console.error('Failed to sync failed task to database:', err);
+      }
+    }
+
+    notify(`Task Uncompleted / Expired! -${statPenalty} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure +${pressureIncrease}`, 'danger', '💀');
+  }, [tasks, stats, profile?.reincarnation_meter, isSupabaseConfigured, isDemoMode, sessionUser, notify]);
 
   const deleteTask = useCallback(async (taskId) => {
     if (isSupabaseConfigured && !isDemoMode && sessionUser) {
@@ -627,10 +691,11 @@ export function useGameState() {
 
     setProfile((prev) => ({
       ...prev,
-      coin_balance: (prev.coin_balance || 0) + coinsAwarded
+      coin_balance: (prev.coin_balance || 0) + coinsAwarded,
+      reincarnation_meter: Math.max(0, (prev.reincarnation_meter || 0) - HABIT_PRESSURE_RELIEF)
     }));
 
-    notify(`Streak increased to ${newStreak}! +${coinsAwarded} Gold Coins deposited in pouch!`, 'gold', '🪙');
+    notify(`Streak increased to ${newStreak}! +${coinsAwarded} Gold Coins | Pressure -${HABIT_PRESSURE_RELIEF}`, 'gold', '🪙');
     return {
       success: true,
       coins_awarded: coinsAwarded,
@@ -641,6 +706,41 @@ export function useGameState() {
 
   // Backward compatibility alias
   const checkInHabit = completeHabit;
+
+  // Habit Streak-Break Action (Adds +10 Pressure, linear coin deduction)
+  // remaining_coins = original_coins * (1 - 0.10 * brokenCount)
+  const handleHabitStreakBreak = useCallback(async (habitId, brokenCount = 1) => {
+    // 1. Reset streak for target habit
+    setHabits((prev) =>
+      prev.map((h) => (h.id === habitId ? { ...h, current_streak: 0 } : h))
+    );
+
+    // 2. Linear coin reduction
+    const retentionRate = calculateStreakBreakCoinRetention(brokenCount);
+    let lostCoins = 0;
+
+    setProfile((prev) => {
+      const originalCoins = prev.coin_balance || 0;
+      const remainingCoins = Math.round(originalCoins * retentionRate);
+      lostCoins = originalCoins - remainingCoins;
+      const newMeter = Math.min(100, (prev.reincarnation_meter || 0) + HABIT_STREAK_BREAK_PRESSURE);
+      return {
+        ...prev,
+        coin_balance: remainingCoins,
+        reincarnation_meter: newMeter
+      };
+    });
+
+    if (isSupabaseConfigured && !isDemoMode && sessionUser) {
+      try {
+        await supabase.rpc('stub_handle_habit_streak_break', { p_habit_id: habitId });
+      } catch (err) {
+        console.warn('Could not call stub_handle_habit_streak_break:', err);
+      }
+    }
+
+    notify(`Streak severed! Lost ${lostCoins} Coins (${Math.round((1 - retentionRate) * 100)}%) | Pressure +${HABIT_STREAK_BREAK_PRESSURE}`, 'danger', '💔');
+  }, [isSupabaseConfigured, isDemoMode, sessionUser, notify]);
 
 
   // =====================================================================
@@ -833,12 +933,14 @@ export function useGameState() {
     signOut,
     createTask,
     completeTask,
+    failTask,
     deleteTask,
     fetchHabits,
     createHabit,
     deleteHabit,
     completeHabit,
     checkInHabit,
+    handleHabitStreakBreak,
     resolveTradeoff,
     adjustReincarnationPressure,
     buyShopItem,

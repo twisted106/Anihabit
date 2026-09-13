@@ -142,13 +142,13 @@ export default function CreateTaskModal({ isOpen, onClose, onCreateTask }) {
             <div className="flex justify-between text-slate-300">
               <span>On Success:</span>
               <span className="text-emerald-400 font-bold">
-                +{selectedDiff.xp} XP, +{selectedDiff.stat} {selectedCat.statLabel}, -8% Pressure
+                +{selectedDiff.xp} XP, +{selectedDiff.stat} {selectedCat.statLabel}, -{selectedDiff.pressureRelief || 1} Pressure
               </span>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>On 24h Expiry:</span>
               <span className="text-rose-400">
-                -{selectedDiff.penalty} {selectedCat.statLabel}, +15% Pressure
+                -{selectedDiff.penalty} {selectedCat.statLabel}, +{selectedDiff.pressureFail || 8} Pressure
               </span>
             </div>
           </div>
