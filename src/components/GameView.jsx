@@ -11,8 +11,7 @@ import { BookOpen, Dumbbell, Sparkles, Flame, Coins, Check, Trash2, Plus, ArrowR
  * Elements:
  * 1. Global Reincarnation Pressure Meter (0-100%, warns +15% per miss, -8% per complete)
  * 2. Ornate Scroll Banner: "Habit / Task"
- * 3. Dark Carved Plaque: "Game View"
- * 4. Carved Wooden/Bronze Rocker Mode Toggle Switch (Quests / Tasks vs. Habit Forge)
+ * 3. Carved Wooden/Bronze Rocker Mode Toggle Switch (Quests / Tasks vs. Habit Forge)
  * 5. Desktop Tabletop Grid:
  *    - Left (Span 4): Champion Card (Knight Protector) + Level Progress (XP) Bar + Character Sheet link
  *    - Right (Span 8):
@@ -147,15 +146,6 @@ export default function GameView({
         </div>
         {/* Right Scroll Curl */}
         <div className="w-7 h-14 bg-gradient-to-l from-parchment-500 to-parchment-300 rounded-r-md border-y-2 border-r-2 border-amber-950 shadow-xl transform skew-y-3" />
-      </div>
-
-      {/* 2. Dark Carved Plaque: "Game View" */}
-      <div className="carved-plaque px-8 py-1.5 rounded-md flex items-center justify-center -mt-2">
-        <span className="text-amber-300 font-cinzel text-sm sm:text-base font-bold tracking-widest uppercase flex items-center gap-2 drop-shadow">
-          <span className="text-amber-500 text-xs">✦</span>
-          Game View
-          <span className="text-amber-500 text-xs">✦</span>
-        </span>
       </div>
 
       {/* 3. Global Reincarnation Pressure Meter (Persistently visible in both modes) */}
@@ -384,7 +374,7 @@ export default function GameView({
                     <div className="pt-2">
                       <button
                         type="button"
-                        onClick={onOpenAddChallenge}
+                        onClick={() => onOpenAddChallenge('habit')}
                         className="carved-plaque px-4 py-1.5 rounded text-xs font-cinzel font-bold text-amber-200 border border-amber-500/70 hover:border-amber-300 shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
                       >
                         + Inscribe First Discipline
@@ -531,19 +521,19 @@ export default function GameView({
 
       </div>
 
-      {/* 6. Floating '+ Add Challenge' Wax-Seal Button (Fixed Bottom-Right) */}
+      {/* 6. Floating Action Wax-Seal Button (Fixed Bottom-Right) */}
       <div className="fixed bottom-20 sm:bottom-8 right-6 sm:right-10 z-30">
         <button
           type="button"
-          onClick={onOpenAddChallenge}
+          onClick={() => onOpenAddChallenge(viewMode === 'tasks' ? 'task' : 'habit')}
           className="wax-seal rounded-full px-5 py-3 border-2 border-amber-400 shadow-2xl flex items-center space-x-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-300 active:scale-95 transition-transform"
-          aria-label="Add a new challenge or habit"
+          aria-label={viewMode === 'tasks' ? 'Add a new quest' : 'Inscribe a new daily habit'}
         >
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-amber-700 border border-yellow-100 flex items-center justify-center font-bold text-amber-950 text-base shadow-inner">
             +
           </div>
           <span className="font-cinzel text-xs sm:text-sm font-bold text-[#faecd1] tracking-wider drop-shadow">
-            Add Challenge
+            {viewMode === 'tasks' ? 'Add Quest' : 'Forge Habit'}
           </span>
         </button>
       </div>
