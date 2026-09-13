@@ -114,7 +114,7 @@ export default function BattlegroundView({
               <div className="absolute -inset-2 rounded-2xl bg-indigo-500/20 blur-md animate-pulse pointer-events-none" />
               
               <div className={`w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-950 via-slate-900 to-black border-2 ${frameBorderClass} flex items-center justify-center relative shadow-2xl animate-float`}>
-                <span className="text-5xl select-none" role="img" aria-label="Player Avatar">🧙‍♂️</span>
+                <Shield className="w-12 h-12 text-indigo-400" />
                 
                 {/* Level Badge */}
                 <div className="absolute -bottom-2 -left-1 px-2.5 py-0.5 rounded-md bg-indigo-600 border border-indigo-400 text-[10px] font-extrabold text-white tracking-wider shadow">
@@ -222,13 +222,11 @@ export default function BattlegroundView({
                       } ${isSubdued ? 'opacity-40 grayscale' : ''}`}
                       style={delayStyles}
                     >
-                      <span>{bossData.emoji}</span>
+                      <Skull className="w-6 h-6 text-stone-300" />
                       
                       {/* Enraged Dark Fire Indicator */}
                       {isRaging && (
-                        <span className="absolute -top-1 -right-1 text-xs animate-bounce" title="Raging Threat!">
-                          🔥
-                        </span>
+                        <Flame className="w-3.5 h-3.5 text-rose-500 fill-rose-500 absolute -top-1 -right-1 animate-bounce" />
                       )}
                     </div>
 
@@ -277,8 +275,8 @@ export default function BattlegroundView({
           </div>
           <span className="text-xs text-slate-400 font-mono">
             {tasks.filter((t) => t.category === targetCategory && !t.is_completed).length === 0
-              ? '✨ This nemesis has been subdued! Zero quests fueling its dark aura.'
-              : '⚔️ Strike with quest completion to weaken its presence:'}
+              ? 'This nemesis has been subdued! Zero quests fueling its dark aura.'
+              : 'Strike with quest completion to weaken its presence:'}
           </span>
         </div>
 

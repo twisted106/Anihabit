@@ -46,7 +46,6 @@ export const CATEGORIES = {
     arenaBoss: {
       name: 'Chronos of Procrastination',
       title: 'Distortion of Thought',
-      emoji: '🦉',
       aura: 'border-indigo-500/40 text-indigo-400'
     }
   },
@@ -62,7 +61,6 @@ export const CATEGORIES = {
     arenaBoss: {
       name: 'The Sloth Behemoth',
       title: 'Weight of Lethargy',
-      emoji: '🦏',
       aura: 'border-rose-500/40 text-rose-400'
     }
   },
@@ -78,7 +76,6 @@ export const CATEGORIES = {
     arenaBoss: {
       name: 'Chaos Chimera',
       title: 'Disorder of Habit',
-      emoji: '🐍',
       aura: 'border-emerald-500/40 text-emerald-400'
     }
   },
@@ -94,7 +91,6 @@ export const CATEGORIES = {
     arenaBoss: {
       name: 'Phantom of Hesitation',
       title: 'Shadow of Doubt',
-      emoji: '👁️',
       aura: 'border-purple-500/40 text-purple-400'
     }
   }

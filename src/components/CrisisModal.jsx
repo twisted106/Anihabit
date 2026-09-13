@@ -26,10 +26,10 @@ export default function CrisisModal({
       aria-labelledby="crisis-dialog-title"
       aria-describedby="crisis-dialog-desc"
     >
-      <div className="guardian-card-frame w-full max-w-xl p-6 sm:p-8 bg-gradient-to-b from-[#2d0909] via-[#1a0505] to-[#0d0202] border-4 border-red-600 shadow-[0_0_50px_rgba(239,68,68,0.5)] relative text-center">
+      <div className="guardian-card-frame w-full max-w-xl max-h-[90vh] overflow-y-auto p-4 sm:p-8 bg-gradient-to-b from-[#2d0909] via-[#1a0505] to-[#0d0202] border-4 border-red-600 shadow-[0_0_50px_rgba(239,68,68,0.5)] relative text-center">
         
         {/* Pulsing Crisis Icon */}
-        <div className="w-16 h-16 mx-auto rounded-full bg-red-600/30 border-2 border-red-500 flex items-center justify-center mb-4 animate-pulse">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-red-600/30 border-2 border-red-500 flex items-center justify-center mb-3 sm:mb-4 animate-pulse">
           <AlertOctagon className="w-8 h-8 text-red-400" />
         </div>
 
@@ -62,7 +62,7 @@ export default function CrisisModal({
             <button
               type="button"
               onClick={() => onResolveTradeoff('stats')}
-              className="mt-4 w-full py-2.5 px-3 rounded-lg bg-red-800 hover:bg-red-700 border border-red-500 text-white font-cinzel font-bold text-xs uppercase tracking-wider shadow-md transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="mt-4 w-full min-h-[44px] py-2.5 px-3 rounded-lg bg-red-800 hover:bg-red-700 border border-red-500 text-white font-cinzel font-bold text-xs uppercase tracking-wider shadow-md transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-400"
             >
               Forfeit 25% Stats
             </button>
@@ -85,7 +85,7 @@ export default function CrisisModal({
             <button
               type="button"
               onClick={() => onResolveTradeoff('coins')}
-              className="mt-4 w-full py-2.5 px-3 rounded-lg bg-amber-700 hover:bg-amber-600 border border-amber-400 text-stone-950 font-cinzel font-black text-xs uppercase tracking-wider shadow-md transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-300"
+              className="mt-4 w-full min-h-[44px] py-2.5 px-3 rounded-lg bg-amber-700 hover:bg-amber-600 border border-amber-400 text-stone-950 font-cinzel font-black text-xs uppercase tracking-wider shadow-md transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-300"
             >
               Tribute 50% Coins
             </button>

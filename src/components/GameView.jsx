@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TabletopCard from './TabletopCard';
 import ReincarnationBar from './ReincarnationBar';
 import { calculateXpToNextLevel, MAX_HABIT_DAILY_COINS, getMostRecentMidnightIST } from '../constants/gameConfig';
-import { BookOpen, Dumbbell, Sparkles, Flame, Coins, Check, Trash2, Plus, ArrowRight } from 'lucide-react';
+import { BookOpen, Dumbbell, Sparkles, Flame, Coins, Check, Trash2, Plus, ArrowRight, Scroll } from 'lucide-react';
 
 /**
  * SCREEN 2 — Desktop & Mobile Tabletop Game View
@@ -137,17 +137,17 @@ export default function GameView({
       {/* 1. Ornate Scroll Banner: "Habit / Task" */}
       <div className="relative flex items-center justify-center w-full max-w-lg mx-auto">
         {/* Left Scroll Curl */}
-        <div className="w-7 h-14 bg-gradient-to-r from-parchment-500 to-parchment-300 rounded-l-md border-y-2 border-l-2 border-amber-950 shadow-xl transform -skew-y-3" />
+        <div className="w-5 sm:w-7 h-11 sm:h-14 bg-gradient-to-r from-parchment-500 to-parchment-300 rounded-l-md border-y-2 border-l-2 border-amber-950 shadow-xl transform -skew-y-3 shrink-0" />
         {/* Center Scroll Body */}
-        <div className="parchment-surface px-10 py-2.5 rounded-sm border-y-2 border-amber-950 flex items-center justify-center shadow-2xl relative -mx-1">
-          <span className="text-amber-950 text-xl md:text-2xl font-cinzel font-black tracking-widest uppercase flex items-center gap-3 drop-shadow-sm">
-            <span className="text-amber-800 text-sm">✦</span>
+        <div className="parchment-surface px-4 sm:px-10 py-2 sm:py-2.5 rounded-sm border-y-2 border-amber-950 flex items-center justify-center shadow-2xl relative -mx-1">
+          <span className="text-amber-950 text-base sm:text-xl md:text-2xl font-cinzel font-black tracking-widest uppercase flex items-center gap-2 sm:gap-3 drop-shadow-sm">
+            <span className="text-amber-800 text-xs sm:text-sm">✦</span>
             Habit / Task
-            <span className="text-amber-800 text-sm">✦</span>
+            <span className="text-amber-800 text-xs sm:text-sm">✦</span>
           </span>
         </div>
         {/* Right Scroll Curl */}
-        <div className="w-7 h-14 bg-gradient-to-l from-parchment-500 to-parchment-300 rounded-r-md border-y-2 border-r-2 border-amber-950 shadow-xl transform skew-y-3" />
+        <div className="w-5 sm:w-7 h-11 sm:h-14 bg-gradient-to-l from-parchment-500 to-parchment-300 rounded-r-md border-y-2 border-r-2 border-amber-950 shadow-xl transform skew-y-3 shrink-0" />
       </div>
 
       {/* 3. Global Reincarnation Pressure Meter (Persistently visible in both modes) */}
@@ -168,14 +168,14 @@ export default function GameView({
             type="button"
             onClick={() => setViewMode('tasks')}
             aria-pressed={viewMode === 'tasks'}
-            className={`flex-1 py-2 px-3 rounded-lg font-cinzel font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 focus:outline-none focus:ring-1 focus:ring-amber-400 ${
+            className={`min-h-[44px] flex-1 py-2.5 px-2 sm:px-3 rounded-lg font-cinzel font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 focus:outline-none focus:ring-1 focus:ring-amber-400 ${
               viewMode === 'tasks'
                 ? 'bg-gradient-to-b from-amber-400 via-amber-600 to-amber-800 text-stone-950 font-black border border-amber-200 shadow-[0_0_16px_rgba(245,180,40,0.6)] scale-[1.02]'
                 : 'text-amber-300/70 hover:text-amber-200 hover:bg-amber-950/40 border border-transparent'
             }`}
             aria-label="Switch to Task view"
           >
-            <span className="text-sm">📜</span>
+            <Scroll className="w-4 h-4 shrink-0" />
             <span>Quests (Tasks)</span>
           </button>
 
@@ -184,14 +184,14 @@ export default function GameView({
             type="button"
             onClick={() => setViewMode('habits')}
             aria-pressed={viewMode === 'habits'}
-            className={`flex-1 py-2 px-3 rounded-lg font-cinzel font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 focus:outline-none focus:ring-1 focus:ring-amber-400 ${
+            className={`min-h-[44px] flex-1 py-2.5 px-2 sm:px-3 rounded-lg font-cinzel font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 focus:outline-none focus:ring-1 focus:ring-amber-400 ${
               viewMode === 'habits'
                 ? 'bg-gradient-to-b from-amber-400 via-amber-600 to-amber-800 text-stone-950 font-black border border-amber-200 shadow-[0_0_16px_rgba(245,180,40,0.6)] scale-[1.02]'
                 : 'text-amber-300/70 hover:text-amber-200 hover:bg-amber-950/40 border border-transparent'
             }`}
             aria-label="Switch to Habit view"
           >
-            <span className="text-sm">🔥</span>
+            <Flame className="w-4 h-4 shrink-0" />
             <span>Habit Forge</span>
           </button>
         </div>
@@ -324,7 +324,7 @@ export default function GameView({
               {/* Bottom Tabletop Relic Bar: Daily Quest Completion */}
               <div className="carved-plaque p-3 rounded-lg flex flex-wrap items-center justify-between gap-3 shadow mt-2">
                 <div className="flex items-center space-x-2.5">
-                  <span className="text-xl" role="img" aria-label="Parchment Scroll">📜</span>
+                  <Scroll className="w-5 h-5 text-amber-400 shrink-0" />
                   <div>
                     <div className="text-xs font-cinzel font-bold text-amber-200">
                       Daily Quest Completion
@@ -411,7 +411,7 @@ export default function GameView({
                       return (
                         <div 
                           key={habit.id}
-                          className={`rounded-xl border transition-all flex items-center justify-between p-3 gap-3 ${
+                          className={`rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between p-2.5 sm:p-3 gap-2.5 sm:gap-3 ${
                             isCompleted 
                               ? 'bg-gradient-to-r from-[#140c06]/80 to-[#0c0603]/80 border-stone-800/80 opacity-75' 
                               : 'bg-gradient-to-r from-[#241409]/90 via-[#1b0d05]/90 to-[#140a04]/90 border-amber-700/60 hover:border-amber-400 hover:shadow-[0_0_18px_rgba(245,180,40,0.25)] hover:scale-[1.006]'
@@ -423,7 +423,7 @@ export default function GameView({
                             onClick={() => !isCompleted && onCompleteHabit?.(habit.id)}
                             disabled={isCompleted}
                             aria-disabled={isCompleted}
-                            className={`flex-1 text-left flex items-center justify-between gap-3 focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-lg p-1 transition-all ${
+                            className={`flex-1 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-lg p-1 transition-all ${
                               isCompleted ? 'cursor-not-allowed' : 'cursor-pointer group'
                             }`}
                             aria-label={
@@ -433,30 +433,31 @@ export default function GameView({
                             }
                           >
                             {/* Left: Category Icon & Details */}
-                            <div className="flex items-center space-x-3 min-w-0">
-                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border ${
+                            <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 w-full sm:w-auto">
+                              <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 border ${
                                 isCompleted 
                                   ? 'bg-stone-900 border-stone-800 text-stone-500' 
                                   : `${catTheme.bg} ${catTheme.border} ${catTheme.text} ${catTheme.shadow} group-hover:scale-105 transition-transform`
                               }`}>
-                                <IconComponent className="w-5 h-5" />
+                                <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
                               </div>
 
-                              <div className="min-w-0">
-                                <div className="flex items-center space-x-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center space-x-1.5 sm:space-x-2">
                                   <h4 className={`font-garamond font-bold text-sm sm:text-base truncate ${
                                     isCompleted ? 'text-stone-400 line-through' : 'text-parchment-100 group-hover:text-amber-200'
                                   }`}>
                                     {habit.title}
                                   </h4>
-                                  <span className="text-[10px] font-cinzel uppercase px-2 py-0.5 rounded-full bg-black/60 border border-amber-600/40 text-amber-300/90 tracking-wider shrink-0">
+                                  <span className="text-[9px] sm:text-[10px] font-cinzel uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-black/60 border border-amber-600/40 text-amber-300/90 tracking-wider shrink-0">
                                     {habit.category}
                                   </span>
                                 </div>
                                 <div className="text-xs font-newsreader text-stone-400 flex items-center gap-1.5 mt-0.5">
                                   <span>Streak:</span>
-                                  <span className="font-bold text-amber-300 font-cinzel text-[11px] flex items-center gap-0.5">
-                                    🔥 {currentStreakVal} {currentStreakVal === 1 ? 'Day' : 'Days'}
+                                  <span className="font-bold text-amber-300 font-cinzel text-[11px] flex items-center gap-1">
+                                    <Flame className="w-3 h-3 text-amber-400 shrink-0" />
+                                    <span>{currentStreakVal} {currentStreakVal === 1 ? 'Day' : 'Days'}</span>
                                   </span>
                                   {habit.longest_streak > currentStreakVal && (
                                     <span className="text-amber-500/70 text-[10px] font-cinzel">(Best: {habit.longest_streak})</span>
@@ -466,17 +467,17 @@ export default function GameView({
                             </div>
 
                             {/* Center/Right: Action Seal / Status Badge */}
-                            <div className="shrink-0 flex items-center space-x-2">
+                            <div className="shrink-0 flex items-center justify-end sm:justify-start space-x-2 w-full sm:w-auto mt-1 sm:mt-0">
                               {isCompleted ? (
                                 /* Sealed for Today Wax Stamp */
-                                <div className="px-3.5 py-1.5 rounded-lg bg-stone-950/90 border border-emerald-700/60 flex items-center gap-1.5 text-emerald-300 text-xs font-cinzel shadow-inner">
+                                <div className="w-full sm:w-auto justify-center px-3.5 py-1.5 min-h-[40px] rounded-lg bg-stone-950/90 border border-emerald-700/60 flex items-center gap-1.5 text-emerald-300 text-xs font-cinzel shadow-inner">
                                   <Check className="w-3.5 h-3.5 text-emerald-400" />
                                   <span>Sealed Today</span>
                                 </div>
                               ) : (
                                 /* Active Fortify Seal */
-                                <div className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 text-stone-950 text-xs font-cinzel font-black border border-yellow-200 shadow-[0_0_15px_rgba(245,180,40,0.6)] group-hover:scale-105 transition-transform flex items-center gap-1.5">
-                                  <span>🪙</span>
+                                <div className="w-full sm:w-auto justify-center px-4 py-2 min-h-[44px] rounded-lg bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 hover:from-amber-400 hover:via-yellow-300 hover:to-amber-500 text-stone-950 text-xs font-cinzel font-black border border-yellow-200 shadow-[0_0_15px_rgba(245,180,40,0.6)] group-hover:scale-105 transition-transform flex items-center gap-1.5 cursor-pointer">
+                                  <Coins className="w-3.5 h-3.5 text-stone-950 shrink-0" />
                                   <span>+{nextCoinReward} GP</span>
                                 </div>
                               )}
@@ -485,18 +486,20 @@ export default function GameView({
 
                           {/* Banish Habit Action */}
                           {onDeleteHabit && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDeleteHabit(habit.id);
-                              }}
-                              className="p-2 rounded-lg text-stone-500 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-800/40 transition-all focus:outline-none focus:ring-1 focus:ring-rose-400 cursor-pointer shrink-0"
-                              aria-label={`Banish habit ${habit.title}`}
-                              title="Banish habit"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="self-end sm:self-center shrink-0">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onDeleteHabit(habit.id);
+                                }}
+                                className="min-h-[38px] min-w-[38px] flex items-center justify-center p-2 rounded-lg text-stone-500 hover:text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-800/40 transition-all focus:outline-none focus:ring-1 focus:ring-rose-400 cursor-pointer"
+                                aria-label={`Banish habit ${habit.title}`}
+                                title="Banish habit"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           )}
                         </div>
                       );
@@ -539,11 +542,11 @@ export default function GameView({
       </div>
 
       {/* 6. Floating Action Wax-Seal Button (Fixed Bottom-Right) */}
-      <div className="fixed bottom-20 sm:bottom-8 right-6 sm:right-10 z-30">
+      <div className="fixed bottom-6 sm:bottom-8 right-4 sm:right-10 z-30">
         <button
           type="button"
           onClick={() => onOpenAddChallenge(viewMode === 'tasks' ? 'task' : 'habit')}
-          className="wax-seal rounded-full px-5 py-3 border-2 border-amber-400 shadow-2xl flex items-center space-x-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-300 active:scale-95 transition-transform"
+          className="wax-seal rounded-full px-4 sm:px-5 py-2.5 sm:py-3 border-2 border-amber-400 shadow-2xl flex items-center space-x-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-300 active:scale-95 transition-transform"
           aria-label={viewMode === 'tasks' ? 'Add a new quest' : 'Inscribe a new daily habit'}
         >
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-yellow-200 via-amber-400 to-amber-700 border border-yellow-100 flex items-center justify-center font-bold text-amber-950 text-base shadow-inner">

@@ -20,29 +20,29 @@ export default function ShopView({
     <div className="w-full max-w-5xl mx-auto space-y-6" data-purpose="screen-shop">
       
       {/* Market Stall Canopy Header */}
-      <div className="carved-plaque px-6 py-3 rounded-xl border-2 border-amber-700/80 shadow-2xl flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-400 p-0.5 border border-amber-800 shadow">
+      <div className="carved-plaque px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border-2 border-amber-700/80 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-400 p-0.5 border border-amber-800 shadow shrink-0">
             <div className="w-full h-full rounded-full bg-stone-950 flex items-center justify-center">
-              <ShoppingBag className="w-5 h-5 text-amber-400" />
+              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
             </div>
           </div>
-          <div>
-            <h2 className="font-cinzel font-black text-base sm:text-lg text-amber-200 tracking-wider uppercase drop-shadow">
+          <div className="min-w-0">
+            <h2 className="font-cinzel font-black text-sm sm:text-base md:text-lg text-amber-200 tracking-wider uppercase drop-shadow truncate">
               The Tavern Bazaar & Merchant Stall
             </h2>
-            <p className="text-xs font-newsreader text-stone-300 italic">
+            <p className="text-[11px] sm:text-xs font-newsreader text-stone-300 italic">
               Adorn your Guild Leaderboard row with prestigious cosmetic borders forged from your daily habit coins
             </p>
           </div>
         </div>
 
         {/* Live Coin Purse in Header */}
-        <div className="flex items-center space-x-2 bg-wood-950/90 border border-amber-600/70 px-4 py-2 rounded-xl shadow-inner">
-          <span className="text-lg">🪙</span>
+        <div className="flex items-center space-x-2 bg-wood-950/90 border border-amber-600/70 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-inner shrink-0">
+          <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 shrink-0" />
           <div>
-            <div className="text-[10px] font-cinzel text-amber-400/80 uppercase leading-none">Your Wealth</div>
-            <div className="text-sm font-cinzel font-black text-amber-300 leading-tight">{coinBalance} GP</div>
+            <div className="text-[9px] sm:text-[10px] font-cinzel text-amber-400/80 uppercase leading-none">Your Wealth</div>
+            <div className="text-xs sm:text-sm font-cinzel font-black text-amber-300 leading-tight">{coinBalance} GP</div>
           </div>
         </div>
       </div>
@@ -79,14 +79,12 @@ export default function ShopView({
                     <span className={`text-[10px] font-cinzel font-bold px-2 py-0.5 rounded border uppercase ${tierClass}`}>
                       {item.tier || 'Cosmetic'}
                     </span>
-                    <span className="text-[9px] font-cinzel text-stone-400 uppercase hidden sm:inline">
-                      Leaderboard Border
-                    </span>
                   </div>
+
                   {isEquipped && (
-                    <span className="text-[10px] font-cinzel font-black px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/70 text-emerald-300 flex items-center gap-1 shadow">
-                      <Check className="w-3 h-3" />
-                      EQUIPPED
+                    <span className="text-[10px] font-cinzel font-bold px-2 py-0.5 rounded bg-emerald-900/80 text-emerald-200 border border-emerald-500/60 flex items-center gap-1 shadow">
+                      <Check className="w-3 h-3 text-emerald-400" />
+                      <span>Equipped</span>
                     </span>
                   )}
                 </div>
@@ -121,7 +119,7 @@ export default function ShopView({
               {/* Action Strip: Price & Buy / Equip Button */}
               <div className="mt-3 pt-2 border-t border-amber-900/60 flex items-center justify-between">
                 <div className="flex items-center space-x-1.5">
-                  <span className="text-sm">🪙</span>
+                  <Coins className="w-4 h-4 text-amber-400 shrink-0" />
                   <span className="font-cinzel font-bold text-sm text-amber-300">
                     {isOwned ? 'Owned' : `${item.cost} GP`}
                   </span>
@@ -131,7 +129,7 @@ export default function ShopView({
                   <button
                     type="button"
                     onClick={() => onToggleEquip(item.id)}
-                    className={`px-3 py-1.5 rounded-lg font-cinzel text-xs font-bold border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
+                    className={`min-h-[40px] px-3.5 py-2 rounded-lg font-cinzel text-xs font-bold border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
                       isEquipped 
                         ? 'bg-emerald-900/80 hover:bg-emerald-800 border-emerald-400 text-emerald-100 shadow'
                         : 'bg-amber-950/90 hover:bg-amber-900 border-amber-500/70 text-amber-200'
@@ -144,13 +142,13 @@ export default function ShopView({
                     type="button"
                     onClick={() => onBuyItem(item)}
                     disabled={!canAfford}
-                    className={`px-3.5 py-1.5 rounded-lg font-cinzel text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
+                    className={`min-h-[40px] px-4 py-2 rounded-lg font-cinzel text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
                       canAfford 
                         ? 'bg-amber-700 hover:bg-amber-600 text-amber-100 border-yellow-300 shadow-lg active:scale-95'
                         : 'bg-stone-900 border-stone-800 text-stone-500 opacity-60 cursor-not-allowed'
                     }`}
                   >
-                    <Sparkles className="w-3 h-3 text-yellow-300" />
+                    <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
                     <span>Purchase</span>
                   </button>
                 )}
