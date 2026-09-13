@@ -32,6 +32,7 @@
 | **Phase 10: A11y, Responsiveness & Verification**| ✅ DONE | 100% |
 | **Phase 14: Habit Forge & Tabletop Habit Mode** | ✅ DONE | 100% |
 | **Phase 15: Clean Header Actions (Remove Summon Buttons)** | ✅ DONE | 100% |
+| **Phase 16: Reincarnation Math Resolved** | ✅ DONE | 100% |
 
 
 
@@ -129,6 +130,19 @@
 | **CLEAN-01** | Remove Summon Challenge Button | Remove `<button>Summon Challenge</button>` from Task mode header in `GameView.jsx` | ✅ `[DONE]` |
 | **CLEAN-02** | Remove Summon Habit Button | Remove `<button>Summon Habit</button>` from Habit mode header in `GameView.jsx` | ✅ `[DONE]` |
 | **CLEAN-03** | Build Verification | Confirm zero syntax/compile errors with `vite build` | ✅ `[DONE]` |
+
+---
+
+### Phase 16: Reincarnation Math Resolved
+*Implementation of flat reward/penalty math, reverse stat scaling, normal pressure scaling, and habit streak-break coin formula.*
+
+| Task ID | Task Title | Description | Status |
+|---|---|---|:---:|
+| **MATH-01** | Central Game Constants | Configure flat XP/stat (+1/+2/+3), reverse penalties (-3/-2/-1), pressure fail (+8/+9/+10), task relief (-1/-2/-3), habit relief (-2), and habit break (+10) in `gameConfig.js` | ✅ `[DONE]` |
+| **MATH-02** | Game State Task & Habit Mechanics | Update `completeTask`, `completeHabit`, and habit streak break coin loss formula in `useGameState.js` | ✅ `[DONE]` |
+| **MATH-03** | UI Badges & Previews Alignment | Update `CardDetailModal.jsx`, `AddChallengeModal.jsx`, `CreateTaskModal.jsx`, and `ReincarnationBar.jsx` with exact flat values | ✅ `[DONE]` |
+| **MATH-04** | PostgreSQL Schema Alignment | Mirror exact flat math and streak break formula in `supabase/schema.sql` RPCs | ✅ `[DONE]` |
+| **MATH-05** | Build & Regression Verification | Verify build passes cleanly with zero errors (`npm run build`) | ✅ `[DONE]` |
 
 
 

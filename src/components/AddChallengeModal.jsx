@@ -340,11 +340,11 @@ export default function AddChallengeModal({
                 <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#1b0e06] to-[#120703] border border-amber-600/50 text-amber-100 text-xs space-y-2 shadow-inner">
                   <div className="font-cinzel font-bold text-[11px] flex justify-between">
                     <span className="text-stone-300">Reward upon completion:</span>
-                    <span className="text-emerald-400 font-bold">+{activeDiff.xp} XP · +{activeDiff.stat} {selectedCategory}</span>
+                    <span className="text-emerald-400 font-bold">+{activeDiff.xp} XP · +{activeDiff.stat} {selectedCategory} · -{activeDiff.pressureRelief || 1} Pressure</span>
                   </div>
                   <div className="font-cinzel text-[11px] flex justify-between">
                     <span className="text-stone-300">Penalty if 24h expires:</span>
-                    <span className="text-rose-400 font-bold">-{activeDiff.penalty} {selectedCategory} · +15% Pressure</span>
+                    <span className="text-rose-400 font-bold">-{activeDiff.penalty} {selectedCategory} · +{activeDiff.pressureFail || 8} Pressure</span>
                   </div>
                 </div>
 

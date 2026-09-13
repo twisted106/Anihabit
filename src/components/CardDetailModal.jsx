@@ -79,7 +79,8 @@ export default function CardDetailModal({
   isDemoMode = true,
   profile = null,
   onClose,
-  onCompleteTask
+  onCompleteTask,
+  onFailTask
 }) {
   const isEnemy = card?.type === 'enemy';
   const isPlayer = card?.type === 'player';
@@ -91,6 +92,14 @@ export default function CardDetailModal({
   // Local state for Player Task History
   const [taskHistory, setTaskHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleFail = async (taskId) => {
+    if (sessionCompletedIds.has(taskId)) return;
+    if (onFailTask) {
+      await onFailTask(taskId);
+      setDomainTasks(prev => prev.filter(t => t.id !== taskId));
+    }
+  };
 
   // Snapshot active tasks or task history on each card modal open
   useEffect(() => {
@@ -345,13 +354,25 @@ export default function CardDetailModal({
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       {/* Reward Badge */}
                       <span className="px-2 py-0.5 rounded bg-emerald-950/90 border border-emerald-500/50 text-[10px] font-cinzel font-bold text-emerald-300 shadow">
-                        +{diff.xp} XP · +{diff.stat} {card.category.slice(0, 3)}
+                        +{diff.xp} XP · +{diff.stat} {card.category.slice(0, 3)} · -{diff.pressureRelief} Bar
                       </span>
-                      {/* Penalty Badge */}
+                      {/* Penalty Badge & Fail Action */}
                       {!isCompleted && (
-                        <span className="px-2 py-0.5 rounded bg-red-950/90 border border-red-600/50 text-[10px] font-cinzel font-bold text-red-300 shadow">
-                          -{diff.penalty} {card.category.slice(0, 3)} if expired
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded bg-red-950/90 border border-red-600/50 text-[10px] font-cinzel font-bold text-red-300 shadow">
+                            -{diff.penalty} {card.category.slice(0, 3)} · +{diff.pressureFail} Bar
+                          </span>
+                          {onFailTask && (
+                            <button
+                              type="button"
+                              onClick={() => handleFail(task.id)}
+                              className="px-1.5 py-0.5 rounded bg-stone-900 hover:bg-red-950 text-stone-400 hover:text-red-300 border border-stone-700 hover:border-red-700 text-[9px] font-cinzel font-bold transition-all cursor-pointer"
+                              title={`Concede quest: -${diff.penalty} Stat, +${diff.pressureFail} Reincarnation Pressure`}
+                            >
+                              Fail
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
 

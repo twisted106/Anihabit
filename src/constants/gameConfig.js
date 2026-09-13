@@ -2,16 +2,22 @@
 // LIFE RPG GAME CONFIGURATION & TUNABLE PARAMETERS
 // =====================================================================
 
-// Reincarnation Meter Dynamics
-// Explicit constraint enforced: RECEIVE_ON_FAIL > REDUCE_ON_COMPLETE (x > y)
-// A single failure adds more to the meter than a single completion removes.
-export const RECEIVE_ON_FAIL = 15;      // x: added on task expiration/failure
-export const REDUCE_ON_COMPLETE = 8;     // y: subtracted on task completion
-export const REINCARNATION_MAX = 100;    // Meter capacity
+// Reincarnation Meter Dynamics (Flat Points 0-100, supersedes legacy percentages)
+// Tasks: Easy (-1/+8), Medium (-2/+9), Hard (-3/+10)
+// Habits: Complete (-2), Streak Break (+10)
+export const RECEIVE_ON_FAIL = 10;      // Default/Hard task fail: +10 pts
+export const REDUCE_ON_COMPLETE = 2;    // Default/Habit complete: -2 pts
+export const REINCARNATION_MAX = 100;   // Meter capacity
 
-if (RECEIVE_ON_FAIL <= REDUCE_ON_COMPLETE) {
-  console.warn("CRITICAL CONFIG WARNING: RECEIVE_ON_FAIL (x) must be strictly greater than REDUCE_ON_COMPLETE (y)!");
-}
+// Habit Reincarnation & Streak Dynamics
+export const HABIT_PRESSURE_RELIEF = 2;        // -2 on habit complete
+export const HABIT_STREAK_BREAK_PRESSURE = 10; // +10 on streak break
+
+// Habit Streak Break Coin Retention Formula:
+// remaining_coins = original_coins * (1 - 0.10 * number_of_habits_broken_that_day)
+export const calculateStreakBreakCoinRetention = (brokenCount = 1) => {
+  return Math.max(0, 1 - 0.10 * brokenCount);
+};
 
 // Habit Escalation Cap
 export const MAX_HABIT_DAILY_COINS = 10;
@@ -94,30 +100,38 @@ export const CATEGORIES = {
   }
 };
 
-// Task Difficulty Scaling
+// Task Difficulty Scaling (Flat rewards, reverse stat penalty, reverse pressure penalty)
+// Complete: Hard (-3), Medium (-2), Easy (-1)
+// Not Complete: Hard (+8), Medium (+9), Easy (+10)
 export const DIFFICULTY_CONFIG = {
   Easy: {
     label: 'Easy',
     multiplier: 1.0,
-    xp: 15,
-    stat: 3,
-    penalty: 2,
+    xp: 1,
+    stat: 1,
+    penalty: 3,        // Reverse-scaled: -3 stat on expiry
+    pressureFail: 10,  // +10 pressure if not completed
+    pressureRelief: 1, // -1 pressure on completion
     badgeClass: 'bg-emerald-900/40 text-emerald-300 border-emerald-700/30'
   },
   Medium: {
     label: 'Medium',
-    multiplier: 1.8,
-    xp: 27,
-    stat: 6,
-    penalty: 4,
+    multiplier: 1.0,
+    xp: 2,
+    stat: 2,
+    penalty: 2,        // Reverse-scaled: -2 stat on expiry
+    pressureFail: 9,   // +9 pressure if not completed
+    pressureRelief: 2, // -2 pressure on completion
     badgeClass: 'bg-amber-900/40 text-amber-300 border-amber-700/30'
   },
   Hard: {
     label: 'Hard',
-    multiplier: 3.0,
-    xp: 45,
-    stat: 10,
-    penalty: 7,
+    multiplier: 1.0,
+    xp: 3,
+    stat: 3,
+    penalty: 1,        // Reverse-scaled: -1 stat on expiry
+    pressureFail: 8,   // +8 pressure if not completed
+    pressureRelief: 3, // -3 pressure on completion
     badgeClass: 'bg-rose-900/40 text-rose-300 border-rose-700/30'
   }
 };

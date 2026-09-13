@@ -47,6 +47,7 @@ export default function App() {
     signOut,
     createTask,
     completeTask,
+    failTask,
     deleteTask,
     fetchHabits,
     createHabit,
@@ -251,6 +252,7 @@ export default function App() {
         profile={profile}
         onClose={() => setInspectedCard(null)}
         onCompleteTask={completeTask}
+        onFailTask={failTask}
       />
 
       {/* SCREEN 4 — Add Challenge Flow Modal */}
