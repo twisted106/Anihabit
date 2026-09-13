@@ -23,6 +23,7 @@ import CardDetailModal from './components/CardDetailModal';
 import AddChallengeModal from './components/AddChallengeModal';
 import CrisisModal from './components/CrisisModal';
 import AuthModal from './components/AuthModal';
+import CustomizeProfileModal from './components/CustomizeProfileModal';
 import ToastContainer from './components/ToastContainer';
 import { Trophy, Shield, Scroll, ShoppingBag } from 'lucide-react';
 
@@ -41,6 +42,8 @@ export default function App() {
     powerScore,
     xpNeeded,
     equippedLeaderboardEffect,
+    claimedBossesThisCycle,
+    currentCycleId,
 
     // Actions
     signOut,
@@ -58,6 +61,7 @@ export default function App() {
     buyShopItem,
     toggleEquipItem,
     fetchLeaderboard,
+    updateProfile,
 
     // Modals & Notifications
     isAuthModalOpen,
@@ -78,6 +82,9 @@ export default function App() {
 
   // Challenge Modal Target Type ('task' | 'habit')
   const [challengeModalType, setChallengeModalType] = useState('task');
+
+  // Profile Customization Modal State
+  const [isCustomizeProfileModalOpen, setIsCustomizeProfileModalOpen] = useState(false);
 
   // Audio mute state
   const [isMuted, setIsMuted] = useState(false);
@@ -146,6 +153,7 @@ export default function App() {
         isDemoMode={isDemoMode}
         profile={profile}
         onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenCustomizeProfile={() => setIsCustomizeProfileModalOpen(true)}
         onSignOut={signOut}
         isMuted={isMuted}
         onToggleMute={toggleMute}
@@ -161,6 +169,8 @@ export default function App() {
             stats={stats}
             tasks={tasks}
             habits={habits}
+            claimedBossesThisCycle={claimedBossesThisCycle}
+            currentCycleId={currentCycleId}
             onInspectCard={(card) => setInspectedCard(card)}
             onOpenAddChallenge={(type = 'task') => {
               setChallengeModalType(type);
@@ -170,6 +180,7 @@ export default function App() {
             onAdjustPressure={adjustReincarnationPressure}
             onCompleteHabit={completeHabit}
             onDeleteHabit={deleteHabit}
+            onOpenCustomizeProfile={() => setIsCustomizeProfileModalOpen(true)}
           />
         )}
 
@@ -179,6 +190,7 @@ export default function App() {
             profile={profile}
             stats={stats}
             habits={habits}
+            onOpenCustomizeProfile={() => setIsCustomizeProfileModalOpen(true)}
           />
         )}
 
@@ -288,9 +300,12 @@ export default function App() {
         sessionUser={sessionUser}
         isDemoMode={isDemoMode}
         profile={profile}
+        claimedBossesThisCycle={claimedBossesThisCycle}
+        currentCycleId={currentCycleId}
         onClose={() => setInspectedCard(null)}
         onCompleteTask={completeTask}
         onFailTask={failTask}
+        onOpenCustomizeProfile={() => setIsCustomizeProfileModalOpen(true)}
       />
 
       {/* SCREEN 4 — Add Challenge Flow Modal */}
@@ -308,6 +323,15 @@ export default function App() {
         stats={stats}
         coinBalance={profile?.coin_balance ?? 0}
         onResolveTradeoff={resolveTradeoff}
+      />
+
+      {/* Profile & Avatar Customization Modal */}
+      <CustomizeProfileModal 
+        isOpen={isCustomizeProfileModalOpen}
+        onClose={() => setIsCustomizeProfileModalOpen(false)}
+        profile={profile}
+        onUpdateProfile={updateProfile}
+        notify={notify}
       />
 
       {/* Combat Log Toasts */}

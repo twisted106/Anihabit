@@ -17,6 +17,7 @@ export default function Navbar({
   isDemoMode,
   profile,
   onOpenAuth,
+  onOpenCustomizeProfile,
   onSignOut,
   isMuted,
   onToggleMute
@@ -26,13 +27,24 @@ export default function Navbar({
       className="w-full relative z-30 border-b-4 border-amber-950/80 bg-gradient-to-b from-[#2b170c] via-[#201007] to-[#160b05] px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-2xl"
       data-purpose="top-navigation-bar"
     >
-      {/* Left: Candle & Player Profile Title */}
-      <div className="flex items-center space-x-3">
-        {/* Burning Candle Ornament */}
-        <div className="relative flex items-center justify-center w-8 h-12" title="Candlelight of Focus">
-          <div className="w-3 h-6 bg-gradient-to-t from-amber-100 to-amber-50 rounded-sm absolute bottom-1 shadow-inner border border-amber-800/40" />
-          <div className="flame-glow w-2.5 h-4 bg-gradient-to-t from-amber-500 via-yellow-300 to-white rounded-full absolute top-1" />
-          <div className="w-6 h-1.5 bg-amber-950 rounded-full absolute bottom-0 shadow-md" />
+      {/* Left: Avatar Thumbnail & Player Profile Title */}
+      <div 
+        className={`flex items-center space-x-3 ${onOpenCustomizeProfile ? 'cursor-pointer group' : ''}`}
+        onClick={onOpenCustomizeProfile}
+        title={onOpenCustomizeProfile ? "Click to customize champion moniker and portrait" : undefined}
+      >
+        {/* Avatar Thumbnail */}
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 border-amber-500/80 overflow-hidden bg-stone-950 shadow-md group-hover:scale-105 transition-transform shrink-0">
+          <img 
+            src={profile?.avatar_url || '/images/avatars/knight_protector.jpg'} 
+            alt={profile?.display_name || 'Champion Avatar'} 
+            className="w-full h-full object-cover"
+          />
+          {onOpenCustomizeProfile && (
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[8px] font-cinzel text-amber-200 font-bold">
+              Edit
+            </div>
+          )}
         </div>
 
         <div>
@@ -44,8 +56,8 @@ export default function Navbar({
               Lv. {profile?.current_level || 1}
             </span>
           </div>
-          <p className="text-xs sm:text-sm font-cinzel font-bold text-parchment-200 tracking-wide drop-shadow truncate max-w-[150px] sm:max-w-xs">
-            {sessionUser?.email ? sessionUser.email.split('@')[0] : 'Hero of the Realm'}
+          <p className="text-xs sm:text-sm font-cinzel font-bold text-parchment-200 tracking-wide drop-shadow truncate max-w-[150px] sm:max-w-xs group-hover:text-amber-300 transition-colors">
+            {profile?.display_name || (sessionUser?.email ? sessionUser.email.split('@')[0] : 'Hero of the Realm')}
           </p>
         </div>
       </div>

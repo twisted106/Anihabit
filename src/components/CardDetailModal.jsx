@@ -78,12 +78,21 @@ export default function CardDetailModal({
   sessionUser = null,
   isDemoMode = true,
   profile = null,
+  claimedBossesThisCycle = [],
+  currentCycleId,
   onClose,
   onCompleteTask,
-  onFailTask
+  onFailTask,
+  onOpenCustomizeProfile
 }) {
   const isEnemy = card?.type === 'enemy';
   const isPlayer = card?.type === 'player';
+
+  // Primary source of truth for claimed state in current cycle
+  const isBossClaimed = Boolean(
+    (claimedBossesThisCycle && card?.category && claimedBossesThisCycle.includes(card.category)) || 
+    card?.isBossClaimed
+  );
 
   // Local state for Enemy domain tasks & session-only completed items
   const [domainTasks, setDomainTasks] = useState([]);
@@ -225,7 +234,7 @@ export default function CardDetailModal({
 
         {/* Top Entity Name & Category Badge */}
         <div className="bg-gradient-to-r from-[#170c05] via-[#221208] to-[#170c05] rounded-xl py-2 px-4 text-center mb-3 border border-amber-700/50 shadow-inner">
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
             <h2 id="card-modal-title" className="font-garamond font-bold text-xl sm:text-2xl text-[#faecd1] tracking-wide drop-shadow">
               {card.name}
             </h2>
@@ -233,6 +242,24 @@ export default function CardDetailModal({
               <span className="px-2 py-0.5 rounded-full bg-black/60 border border-amber-500/60 text-[10px] font-cinzel text-amber-300 uppercase tracking-wider">
                 {card.category}
               </span>
+            )}
+            {profile && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/50 text-[11px] font-cinzel text-amber-300 font-bold shadow-sm">
+                <span>💰</span> {profile.coin_balance ?? 0} GP
+              </span>
+            )}
+            {isPlayer && onOpenCustomizeProfile && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenCustomizeProfile();
+                }}
+                className="px-2.5 py-0.5 rounded-full bg-amber-900/80 hover:bg-amber-800 border border-amber-500/70 text-[10px] font-cinzel text-amber-200 hover:text-white font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1"
+                title="Customize champion moniker and portrait"
+              >
+                <span>✦</span> Edit Profile
+              </button>
             )}
           </div>
           <p className="text-[11px] font-newsreader text-amber-400/80 italic mt-0.5">
@@ -255,10 +282,10 @@ export default function CardDetailModal({
           {isEnemy && (
             <div className={`absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-black/85 border text-xs font-cinzel shadow transition-colors ${
               activePendingCount === 0 
-                ? 'border-stone-700 text-stone-400' 
+                ? 'border-amber-600/70 text-amber-300 font-bold' 
                 : 'border-amber-500/60 text-amber-300'
             }`}>
-              {activePendingCount} Active Challenges Pending
+              {activePendingCount === 0 ? '✦ DEFEATED (0 Active Challenges)' : `${activePendingCount} Active Challenges Pending`}
             </div>
           )}
 
@@ -278,6 +305,35 @@ export default function CardDetailModal({
         {/* ========================================================================= */}
         {/* CASE A: ENEMY CARD (Domain Active Tasks with Session Strikethrough) */}
         {/* ========================================================================= */}
+        {isEnemy && (
+          <div className={`p-2.5 rounded-xl border text-xs font-cinzel mb-2.5 flex items-center justify-between shadow-inner transition-colors ${
+            isBossClaimed
+              ? 'bg-emerald-950/70 border-emerald-600/50 text-emerald-200'
+              : 'bg-amber-950/70 border-amber-600/50 text-amber-200'
+          }`}>
+            <div className="flex items-center gap-2">
+              <span className="text-base">{isBossClaimed ? '✅' : '👑'}</span>
+              <div>
+                <span className="font-bold uppercase tracking-wider block text-[11px]">
+                  Cycle Defeat Bounty ({currentCycleId || card?.currentCycleId || 'Weekly'})
+                </span>
+                <span className="text-[10px] font-newsreader text-stone-300">
+                  {isBossClaimed
+                    ? '50 Gold Coins claimed for this leaderboard cycle. Subsequent defeats grant 0 GP.'
+                    : '50 Gold Coins awarded automatically upon defeating this adversary (clearing all domain quests). Once per cycle.'}
+                </span>
+              </div>
+            </div>
+            <span className={`px-2.5 py-1 rounded text-[10px] font-bold border whitespace-nowrap ${
+              isBossClaimed
+                ? 'bg-emerald-900/80 border-emerald-500 text-emerald-300'
+                : 'bg-amber-900/80 border-amber-500 text-amber-300'
+            }`}>
+              {isBossClaimed ? '50 GP Claimed' : '50 GP Available'}
+            </span>
+          </div>
+        )}
+
         {isEnemy ? (
           <div className="flex-1 overflow-y-auto space-y-2 pr-1">
             <div className="flex items-center justify-between border-b border-amber-900/60 pb-1.5 mb-2 text-xs font-cinzel text-amber-300">
@@ -290,12 +346,16 @@ export default function CardDetailModal({
                 Consulting Tavern Scrolls...
               </div>
             ) : domainTasks.length === 0 ? (
-              <div className="parchment-surface p-5 rounded-xl text-center my-3 border border-amber-950 shadow-inner">
+              <div className="parchment-surface p-5 rounded-xl text-center my-3 border border-amber-950 shadow-inner space-y-1">
                 <p className="font-cinzel text-xs font-bold text-amber-950 uppercase tracking-wider">
-                  No active challenges registered for {card.category}!
+                  {isBossClaimed 
+                    ? `✦ All Quests Cleared for ${card.category}!` 
+                    : `✦ Adversary Subdued in ${card.category}!`}
                 </p>
                 <p className="text-[11px] font-newsreader text-amber-900 mt-1">
-                  Use the "+ Add Challenge" button to summon a new quest for this domain.
+                  {isBossClaimed
+                    ? 'Adversary has been defeated and bounty claimed for this cycle. Summon new quests to continue training.'
+                    : 'All quests in this domain are resolved! Adversary subdued and victory bounty secured.'}
                 </p>
               </div>
             ) : (

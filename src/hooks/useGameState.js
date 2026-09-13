@@ -22,7 +22,10 @@ import {
   calculateXpToNextLevel,
   calculatePowerScore,
   getMostRecentMidnightIST,
-  LEADERBOARD_BORDER_ITEMS
+  LEADERBOARD_BORDER_ITEMS,
+  BOSS_DEFEAT_COIN_REWARD,
+  CATEGORY_BOSS_MAP,
+  getCurrentLeaderboardCycleId
 } from '../constants/gameConfig';
 import { sound } from '../lib/audio';
 import confetti from 'canvas-confetti';
@@ -33,6 +36,8 @@ import confetti from 'canvas-confetti';
 const DEMO_PROFILE = {
   id: 'demo-hero-id',
   email: 'hero@anihabit.rpg',
+  display_name: 'Knight Protector',
+  avatar_url: '/images/avatars/knight_protector.jpg',
   current_level: 1,
   current_xp: 35,
   coin_balance: 14,
@@ -74,9 +79,8 @@ const DEMO_TASKS = [
     title: 'Prepare Healthy Meal Plan',
     category: 'Lifestyle',
     difficulty: 'Easy',
-    is_completed: true,
+    is_completed: false,
     deadline_at: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-    completed_at: new Date().toISOString(),
     created_at: new Date().toISOString()
   },
   {
@@ -151,6 +155,36 @@ const saveStoredInventory = (inv) => {
   } catch {}
 };
 
+const getDemoBossClaims = (cycleId) => {
+  try {
+    const raw = localStorage.getItem(`demo_boss_defeat_claims_${cycleId}`);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveDemoBossClaims = (cycleId, claims) => {
+  try {
+    localStorage.setItem(`demo_boss_defeat_claims_${cycleId}`, JSON.stringify(claims));
+  } catch {}
+};
+
+const getStoredCustomProfile = () => {
+  try {
+    const raw = localStorage.getItem('anihabit_custom_profile');
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
+const saveStoredCustomProfile = (customData) => {
+  try {
+    localStorage.setItem('anihabit_custom_profile', JSON.stringify(customData));
+  } catch {}
+};
+
 export function useGameState() {
   // Session & Authentication
   const [sessionUser, setSessionUser] = useState(null);
@@ -158,13 +192,25 @@ export function useGameState() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Core RPG Entities
-  const [profile, setProfile] = useState(DEMO_PROFILE);
+  const [profile, setProfile] = useState(() => {
+    const custom = getStoredCustomProfile();
+    return {
+      ...DEMO_PROFILE,
+      ...custom
+    };
+  });
   const [stats, setStats] = useState(DEMO_STATS);
   const [tasks, setTasks] = useState(DEMO_TASKS);
   const [habits, setHabits] = useState(DEMO_HABITS);
   const [shopItems, setShopItems] = useState(DEFAULT_SHOP_ITEMS);
   const [userInventory, setUserInventory] = useState(getStoredInventory);
   const [leaderboard, setLeaderboard] = useState([]);
+
+  // Boss Defeat Claims in current leaderboard cycle: array of category keys, e.g. ['Fitness']
+  const [claimedBossesThisCycle, setClaimedBossesThisCycle] = useState(() => {
+    const currentCycle = getCurrentLeaderboardCycleId();
+    return getDemoBossClaims(currentCycle);
+  });
 
   // UI Modals & Notifications
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -206,7 +252,12 @@ export function useGameState() {
         .single();
 
       if (profileData && !profileErr) {
-        setProfile(profileData);
+        const custom = getStoredCustomProfile();
+        setProfile({
+          ...profileData,
+          display_name: profileData.display_name || custom.display_name || 'Knight Protector',
+          avatar_url: profileData.avatar_url || custom.avatar_url || '/images/avatars/knight_protector.jpg'
+        });
       }
 
       // 2. Fetch Stats
@@ -280,6 +331,22 @@ export function useGameState() {
       setUserInventory(finalInventory);
       saveStoredInventory(finalInventory);
 
+      // 7. Fetch Boss Defeat Claims for Current Cycle
+      const currentCycle = getCurrentLeaderboardCycleId();
+      try {
+        const { data: claimsData } = await supabase
+          .from('boss_defeat_claims')
+          .select('category')
+          .eq('user_id', userId)
+          .eq('cycle_id', currentCycle);
+
+        if (claimsData) {
+          setClaimedBossesThisCycle(claimsData.map((c) => c.category));
+        }
+      } catch (claimsErr) {
+        console.warn('Could not fetch boss defeat claims:', claimsErr);
+      }
+
     } catch (err) {
       console.error('Error hydrating game data from Supabase:', err);
       notify('Failed to sync remote data. Running in offline view.', 'warning', '📡');
@@ -315,7 +382,8 @@ export function useGameState() {
       } else {
         setSessionUser(null);
         setIsDemoMode(true);
-        setProfile(DEMO_PROFILE);
+        const custom = getStoredCustomProfile();
+        setProfile({ ...DEMO_PROFILE, ...custom });
         setStats(DEMO_STATS);
         setTasks(DEMO_TASKS);
         setHabits(DEMO_HABITS);
@@ -345,13 +413,13 @@ export function useGameState() {
     const mockRanks = [
       { rank: 1, user_id: 'mock-1', display_name: 'AetherMage', current_level: 12, average_stat: 48.5, intellect: 65, strength: 40, discipline: 45, willpower: 44, equipped_leaderboard_effect: 'border_ember_rune' },
       { rank: 2, user_id: 'mock-2', display_name: 'ValkyriePrime', current_level: 10, average_stat: 41.2, intellect: 35, strength: 58, discipline: 38, willpower: 34, equipped_leaderboard_effect: 'border_bronze_sigil' },
-      { rank: 3, user_id: sessionUser?.id || 'demo-hero-id', display_name: sessionUser?.email ? sessionUser.email.split('@')[0] : 'Hero (You)', current_level: profile.current_level, average_stat: calculatePowerScore(stats), intellect: stats.intellect, strength: stats.strength, discipline: stats.discipline, willpower: stats.willpower, equipped_leaderboard_effect: activeEquippedBorder },
+      { rank: 3, user_id: sessionUser?.id || 'demo-hero-id', display_name: profile.display_name || (sessionUser?.email ? sessionUser.email.split('@')[0] : 'Hero (You)'), current_level: profile.current_level, average_stat: calculatePowerScore(stats), intellect: stats.intellect, strength: stats.strength, discipline: stats.discipline, willpower: stats.willpower, equipped_leaderboard_effect: activeEquippedBorder },
       { rank: 4, user_id: 'mock-4', display_name: 'ShadowBlade', current_level: 8, average_stat: 28.0, intellect: 20, strength: 34, discipline: 32, willpower: 26, equipped_leaderboard_effect: 'border_iron_band' },
       { rank: 5, user_id: 'mock-5', display_name: 'ZenDisciple', current_level: 7, average_stat: 24.5, intellect: 22, strength: 18, discipline: 38, willpower: 20, equipped_leaderboard_effect: null }
     ].sort((a, b) => b.average_stat - a.average_stat).map((item, idx) => ({ ...item, rank: idx + 1 }));
 
     setLeaderboard(mockRanks);
-  }, [isDemoMode, sessionUser, profile.current_level, profile?.equipped_leaderboard_effect, userInventory, stats]);
+  }, [isDemoMode, sessionUser, profile.current_level, profile.display_name, profile?.equipped_leaderboard_effect, userInventory, stats]);
 
   // =====================================================================
   // ACTIONS: TASK MANAGEMENT
@@ -423,9 +491,47 @@ export function useGameState() {
     let totalXpGain = xpGained;
     let totalStatGain = statGained;
 
+    // Boss Monster Defeat Bounty (50 Gold Coins on First Defeat per Leaderboard Cycle)
+    const currentCycle = getCurrentLeaderboardCycleId();
+    const bossInfo = CATEGORY_BOSS_MAP[targetTask.category] || { name: `${targetTask.category} Boss`, category: targetTask.category };
+    const alreadyClaimedInCycle = claimedBossesThisCycle.includes(targetTask.category);
+
+    let coinsToAdd = 0;
     if (isCategoryAllClear) {
-      confetti({ particleCount: 60, spread: 50, origin: { y: 0.7 } });
-      notify(`CATEGORY ALL-CLEAR! ${targetTask.category} realm liberated!`, 'gold', '🌟');
+      if (!alreadyClaimedInCycle) {
+        coinsToAdd = BOSS_DEFEAT_COIN_REWARD;
+        confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+        sound.playPurchase?.();
+        notify(`👑 BOSS DEFEATED: ${bossInfo.name} subdued! +${BOSS_DEFEAT_COIN_REWARD} Gold Coins claimed! (Cycle ${currentCycle})`, 'gold', '💰');
+
+        const nextClaims = [...claimedBossesThisCycle.filter((c) => c !== targetTask.category), targetTask.category];
+        setClaimedBossesThisCycle(nextClaims);
+        saveDemoBossClaims(currentCycle, nextClaims);
+
+        if (isSupabaseConfigured && !isDemoMode && sessionUser) {
+          try {
+            await supabase.rpc('claim_boss_defeat_reward', {
+              p_category: targetTask.category,
+              p_boss_name: bossInfo.name,
+              p_cycle_id: currentCycle
+            });
+          } catch (claimErr) {
+            try {
+              await supabase.from('boss_defeat_claims').insert([{
+                user_id: sessionUser.id,
+                category: targetTask.category,
+                boss_name: bossInfo.name,
+                cycle_id: currentCycle,
+                reward_coins: BOSS_DEFEAT_COIN_REWARD
+              }]);
+            } catch (fbErr) {}
+          }
+        }
+      } else {
+        // Repeat Defeat in same cycle: 0 additional coins (Loophole Closed)
+        confetti({ particleCount: 40, spread: 40, origin: { y: 0.7 } });
+        notify(`⚔️ ${targetTask.category} realm cleared! (${bossInfo.name} bounty already claimed for cycle ${currentCycle})`, 'gold', '🌟');
+      }
     }
 
     // Target Reincarnation meter after strictly decreasing by difficulty relief:
@@ -453,12 +559,23 @@ export function useGameState() {
           console.warn('Could not sync reincarnation_meter directly to profiles table:', updateErr);
         }
 
+        if (coinsToAdd > 0) {
+          try {
+            const { data: curProf } = await supabase.from('profiles').select('coin_balance').eq('id', sessionUser.id).single();
+            const curBal = Number(curProf?.coin_balance || 0);
+            await supabase.from('profiles').update({ coin_balance: curBal + coinsToAdd }).eq('id', sessionUser.id);
+          } catch (profErr) {
+            console.warn('Could not sync coin_balance to Supabase profiles:', profErr);
+          }
+        }
+
         await refreshGameData(sessionUser.id);
 
-        // Force local state to targetMeter
+        // Force local state to targetMeter and ensure bounty coins are credited
         setProfile((prev) => ({
           ...prev,
-          reincarnation_meter: targetMeter
+          reincarnation_meter: targetMeter,
+          coin_balance: Math.max(Number(prev?.coin_balance || 0), Number(profile?.coin_balance || 0) + coinsToAdd)
         }));
 
         notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success', '✨');
@@ -479,7 +596,7 @@ export function useGameState() {
       [statKey]: prev[statKey] + totalStatGain
     }));
 
-    // Update Profile & Check Non-linear Leveling
+    // Update Profile & Check Non-linear Leveling, adding bounty coins atomically
     setProfile((prev) => {
       let currentXp = prev.current_xp + totalXpGain;
       let currentLevel = prev.current_level;
@@ -504,12 +621,14 @@ export function useGameState() {
         current_level: currentLevel,
         current_xp: currentXp,
         // Relieve reincarnation meter strictly by task difficulty relief: Easy (-1), Medium (-2), Hard (-3)
-        reincarnation_meter: targetMeter
+        reincarnation_meter: targetMeter,
+        // Atomically add coins directly here upon enemy defeat
+        coin_balance: Number(prev?.coin_balance || 0) + coinsToAdd
       };
     });
 
     notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success', '🛡️');
-  }, [tasks, profile?.reincarnation_meter, isDemoMode, sessionUser, refreshGameData, notify]);
+  }, [tasks, profile?.reincarnation_meter, profile?.coin_balance, isDemoMode, sessionUser, refreshGameData, notify, claimedBossesThisCycle]);
 
   // Expire / Fail Task (When task is not completed / 24h expires)
   // Reincarnation Bar increased by: Easy (+8), Medium (+9), Hard (+10)
@@ -941,6 +1060,44 @@ export function useGameState() {
     }
   }, [shopItems, userInventory, isDemoMode, sessionUser, notify]);
 
+  // Profile Customization Action (Player Name & Avatar)
+  const updateProfile = useCallback(async ({ display_name, avatar_url }) => {
+    const trimmedName = display_name?.trim();
+    if (!trimmedName) {
+      notify('Please enter a valid champion moniker', 'warning', '⚠️');
+      return { success: false, error: 'Empty name' };
+    }
+
+    setProfile((prev) => {
+      const nextProfile = {
+        ...prev,
+        display_name: trimmedName,
+        ...(avatar_url ? { avatar_url } : {})
+      };
+
+      saveStoredCustomProfile({
+        display_name: nextProfile.display_name,
+        avatar_url: nextProfile.avatar_url
+      });
+
+      return nextProfile;
+    });
+
+    if (isSupabaseConfigured && !isDemoMode && sessionUser?.id) {
+      try {
+        const updates = { display_name: trimmedName };
+        if (avatar_url) updates.avatar_url = avatar_url;
+        await supabase.from('profiles').update(updates).eq('id', sessionUser.id);
+      } catch (err) {
+        console.warn('Failed to update profile in Supabase:', err);
+      }
+    }
+
+    sound.playLevelUp?.();
+    notify(`Champion profile updated: ${trimmedName}!`, 'success', '✨');
+    return { success: true };
+  }, [isSupabaseConfigured, isDemoMode, sessionUser, notify]);
+
   // Sign Out Handler
   const signOut = useCallback(async () => {
     try {
@@ -952,7 +1109,8 @@ export function useGameState() {
     } finally {
       setSessionUser(null);
       setIsDemoMode(true);
-      setProfile(DEMO_PROFILE);
+      const custom = getStoredCustomProfile();
+      setProfile({ ...DEMO_PROFILE, ...custom });
       setStats(DEMO_STATS);
       setTasks(DEMO_TASKS);
       setHabits(DEMO_HABITS);
@@ -982,10 +1140,13 @@ export function useGameState() {
     habits,
     shopItems,
     userInventory,
-    leaderboard,
     powerScore,
     xpNeeded,
+    // Leaderboard & Cycle Info
+    leaderboard,
     equippedLeaderboardEffect,
+    claimedBossesThisCycle,
+    currentCycleId: getCurrentLeaderboardCycleId(),
     equippedTitle: 'Guild Champion',
     equippedFrame: null,
 
@@ -1007,6 +1168,9 @@ export function useGameState() {
     toggleEquipItem,
     fetchLeaderboard,
     refreshGameData,
+
+    // Profile Customization
+    updateProfile,
 
     // UI Modals & Notifications
     isAuthModalOpen,

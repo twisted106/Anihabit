@@ -159,6 +159,43 @@ export const getMostRecentMidnightIST = () => {
 };
 
 // =====================================================================
+// BOSS DEFEAT BOUNTY & LEADERBOARD CYCLE DYNAMICS
+// 50 Gold Coins awarded when an adversary card is subdued (0 active tasks),
+// strictly capped at once per boss monster per leaderboard cycle.
+// =====================================================================
+export const BOSS_DEFEAT_COIN_REWARD = 50;
+
+export const CATEGORY_BOSS_MAP = {
+  Fitness: { id: 'boss_fitness', name: 'Red Drake', category: 'Fitness' },
+  Academics: { id: 'boss_academics', name: 'Crypt Warden', category: 'Academics' },
+  Lifestyle: { id: 'boss_lifestyle', name: 'Goblin Scout', category: 'Lifestyle' },
+  Other: { id: 'boss_other', name: 'Wood Wisp', category: 'Other' }
+};
+
+/**
+ * Returns the current canonical Leaderboard Cycle ID (ISO-8601 week in IST, e.g. "2026-W37").
+ * Cycles transition every Monday at 00:00:00 IST.
+ */
+export const getCurrentLeaderboardCycleId = () => {
+  const now = new Date();
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(now.getTime() + IST_OFFSET_MS);
+
+  // ISO week calculation in IST
+  const target = new Date(istDate.valueOf());
+  const dayNr = (istDate.getUTCDay() + 6) % 7; // Monday = 0
+  target.setUTCDate(target.getUTCDate() - dayNr + 3);
+  const firstThursday = target.valueOf();
+  target.setUTCMonth(0, 1);
+  if (target.getUTCDay() !== 4) {
+    target.setUTCMonth(0, 1 + ((4 - target.getUTCDay() + 7) % 7));
+  }
+  const weekNumber = 1 + Math.ceil((firstThursday - target) / 604800000);
+  return `${istDate.getUTCFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
+};
+
+
+// =====================================================================
 // LEADERBOARD COSMETIC BORDER EFFECTS (Shop Items)
 // Exclusively decorative, zero effect on stats, XP, coins, or rank.
 // =====================================================================
