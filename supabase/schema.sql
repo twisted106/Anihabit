@@ -97,6 +97,14 @@ CREATE POLICY "Users can update their own profile"
     ON public.profiles FOR UPDATE 
     USING (auth.uid() = id);
 
+-- Profiles: INSERT allowed only when id = auth.uid() (used by handle_new_user trigger)
+DROP POLICY IF EXISTS "Service can insert new profile on signup" ON public.profiles;
+CREATE POLICY "Service can insert new profile on signup"
+    ON public.profiles FOR INSERT
+    WITH CHECK (auth.uid() = id);
+-- Note: No DELETE policy on profiles — deletion cascades from auth.users and is not
+-- permitted via direct client calls (blocked by default without a permissive policy).
+
 -- Stats: Users manage their own stats
 DROP POLICY IF EXISTS "Users can view their own stats" ON public.stats;
 CREATE POLICY "Users can view their own stats" 
@@ -107,6 +115,14 @@ DROP POLICY IF EXISTS "Users can update their own stats" ON public.stats;
 CREATE POLICY "Users can update their own stats" 
     ON public.stats FOR UPDATE 
     USING (auth.uid() = user_id);
+
+-- Stats: INSERT allowed only when user_id = auth.uid() (used by handle_new_user trigger)
+DROP POLICY IF EXISTS "Service can insert stats on signup" ON public.stats;
+CREATE POLICY "Service can insert stats on signup"
+    ON public.stats FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+-- Note: No DELETE policy on stats — deletion cascades from profiles and is not
+-- permitted via direct client calls.
 
 -- Tasks: Full CRUD for own tasks
 DROP POLICY IF EXISTS "Users can view their own tasks" ON public.tasks;
@@ -150,12 +166,14 @@ CREATE POLICY "Users can delete their own habits"
     ON public.habits FOR DELETE 
     USING (auth.uid() = user_id);
 
--- Items: Readable by all authenticated users
+-- Items: Readable by all authenticated users (catalog is admin-managed; no write policies granted)
 DROP POLICY IF EXISTS "Items catalog is viewable by authenticated users" ON public.items;
 CREATE POLICY "Items catalog is viewable by authenticated users" 
     ON public.items FOR SELECT 
     TO authenticated 
     USING (true);
+-- Note: No INSERT/UPDATE/DELETE policies on items — catalog rows are managed
+-- via migrations/admin only. Client writes are blocked by default.
 
 -- User Inventory: Manage own inventory
 DROP POLICY IF EXISTS "Users can view their inventory" ON public.user_inventory;
@@ -171,6 +189,11 @@ CREATE POLICY "Users can insert into their inventory"
 DROP POLICY IF EXISTS "Users can update their inventory" ON public.user_inventory;
 CREATE POLICY "Users can update their inventory" 
     ON public.user_inventory FOR UPDATE 
+    USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete from their inventory" ON public.user_inventory;
+CREATE POLICY "Users can delete from their inventory"
+    ON public.user_inventory FOR DELETE
     USING (auth.uid() = user_id);
 
 -- =====================================================================

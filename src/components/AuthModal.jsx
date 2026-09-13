@@ -25,6 +25,12 @@ export default function AuthModal({ isOpen, onClose, onGuestMode, notify }) {
     setErrorMsg('');
     setLoading(true);
 
+    if (!isSupabaseConfigured || !supabase) {
+      setErrorMsg('Supabase is not configured. Please set up your .env file.');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({ email, password });
