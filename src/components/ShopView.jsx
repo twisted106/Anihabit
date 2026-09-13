@@ -32,7 +32,7 @@ export default function ShopView({
               The Tavern Bazaar & Merchant Stall
             </h2>
             <p className="text-xs font-newsreader text-stone-300 italic">
-              Adorn your champion with illustrious cosmetics forged from your daily habit coins
+              Adorn your Guild Leaderboard row with prestigious cosmetic borders forged from your daily habit coins
             </p>
           </div>
         </div>
@@ -54,6 +54,18 @@ export default function ShopView({
           const isOwned = Boolean(inventoryRecord);
           const isEquipped = Boolean(inventoryRecord?.is_equipped);
           const canAfford = coinBalance >= item.cost;
+          const borderClass = item.cssClass || (
+            item.id === 'border_iron_band' ? 'leaderboard-border-iron' :
+            item.id === 'border_bronze_sigil' ? 'leaderboard-border-bronze' :
+            item.id === 'border_ember_rune' ? 'leaderboard-border-ember' : ''
+          );
+
+          // Tier badge colors
+          const tierClass = item.tier === 'Legendary' 
+            ? 'bg-amber-950/90 border-amber-500 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)]'
+            : item.tier === 'Rare'
+            ? 'bg-amber-900/60 border-amber-600 text-amber-200'
+            : 'bg-stone-900 border-stone-600 text-stone-300';
 
           return (
             <div 
@@ -61,11 +73,16 @@ export default function ShopView({
               className="guardian-card-frame p-3 bg-wood-planks border-3 border-[#201308] relative flex flex-col justify-between"
             >
               <div>
-                {/* Item Category Tag */}
+                {/* Item Tier & Status Tag */}
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-[10px] font-cinzel font-bold px-2 py-0.5 rounded bg-black/70 border border-amber-600/60 text-amber-300 uppercase">
-                    {item.category.replace('_', ' ')}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[10px] font-cinzel font-bold px-2 py-0.5 rounded border uppercase ${tierClass}`}>
+                      {item.tier || 'Cosmetic'}
+                    </span>
+                    <span className="text-[9px] font-cinzel text-stone-400 uppercase hidden sm:inline">
+                      Leaderboard Border
+                    </span>
+                  </div>
                   {isEquipped && (
                     <span className="text-[10px] font-cinzel font-black px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/70 text-emerald-300 flex items-center gap-1 shadow">
                       <Check className="w-3 h-3" />
@@ -74,12 +91,20 @@ export default function ShopView({
                   )}
                 </div>
 
-                {/* Item Art Panel */}
+                {/* Item Art Panel with Live Leaderboard Preview */}
                 <div className="w-full h-36 rounded-md bg-gradient-to-b from-stone-900 via-stone-950 to-black border border-[#523712] flex flex-col items-center justify-center p-3 shadow-inner relative overflow-hidden mb-3">
-                  <div className="text-5xl filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] transform hover:scale-110 transition-transform">
+                  <div className="text-3xl mb-2 filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
                     {item.icon}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#100b06]/80 via-transparent to-transparent pointer-events-none" />
+                  
+                  {/* Visual Live Preview of Row Border */}
+                  <div className={`w-full max-w-[210px] py-1.5 px-2.5 bg-stone-950/90 flex items-center justify-between text-[11px] font-cinzel shadow ${borderClass}`}>
+                    <span className="text-amber-200 font-bold truncate">#1 Hero (You)</span>
+                    <span className="text-amber-400 font-bold text-[10px]">PWR 45.0</span>
+                  </div>
+                  <div className="text-[9px] font-cinzel text-stone-400 mt-1 uppercase tracking-wider">
+                    Live Leaderboard Preview
+                  </div>
                 </div>
 
                 {/* Item Title & Description */}
@@ -87,7 +112,7 @@ export default function ShopView({
                   <h3 className="font-garamond font-bold text-base text-[#faecd1] leading-tight">
                     {item.name}
                   </h3>
-                  <p className="text-[11px] font-newsreader text-amber-300/70 italic mt-0.5 line-clamp-2">
+                  <p className="text-[11px] font-newsreader text-amber-300/80 italic mt-0.5 line-clamp-2">
                     {item.description || 'A prized cosmetic artifact forged by guild artisans.'}
                   </p>
                 </div>
@@ -109,10 +134,10 @@ export default function ShopView({
                     className={`px-3 py-1.5 rounded-lg font-cinzel text-xs font-bold border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-400 ${
                       isEquipped 
                         ? 'bg-emerald-900/80 hover:bg-emerald-800 border-emerald-400 text-emerald-100 shadow'
-                        : 'bg-stone-800 hover:bg-stone-700 border-amber-700/60 text-amber-200'
+                        : 'bg-amber-950/90 hover:bg-amber-900 border-amber-500/70 text-amber-200'
                     }`}
                   >
-                    {isEquipped ? 'Unequip' : 'Equip Gear'}
+                    {isEquipped ? 'Unequip' : 'Equip Border'}
                   </button>
                 ) : (
                   <button

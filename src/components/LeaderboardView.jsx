@@ -11,8 +11,16 @@ import { Trophy, Shield, Award, User } from 'lucide-react';
 export default function LeaderboardView({
   leaderboard = [],
   currentUserId,
-  powerScore
+  powerScore,
+  equippedLeaderboardEffect
 }) {
+  const getBorderEffectClass = (effectId) => {
+    if (effectId === 'border_iron_band') return 'leaderboard-border-iron';
+    if (effectId === 'border_bronze_sigil') return 'leaderboard-border-bronze';
+    if (effectId === 'border_ember_rune') return 'leaderboard-border-ember';
+    return '';
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-4" data-purpose="screen-leaderboard">
       
@@ -52,14 +60,25 @@ export default function LeaderboardView({
               const isCurrentUser = entry.user_id === currentUserId;
               const isTopThree = rank <= 3;
 
+              const effectId = isCurrentUser 
+                ? (equippedLeaderboardEffect || entry.equipped_leaderboard_effect)
+                : entry.equipped_leaderboard_effect;
+              const borderEffectClass = getBorderEffectClass(effectId);
+
               return (
                 <div
                   key={entry.user_id || index}
-                  className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-4 ${
-                    isCurrentUser 
-                      ? 'bg-amber-950/90 border-amber-400/80 ring-2 ring-amber-400/40 shadow-lg' 
-                      : 'bg-wood-900/80 border-amber-900/60 hover:border-amber-700'
+                  tabIndex={0}
+                  className={`p-3 transition-all flex items-center justify-between gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-offset-2 ${
+                    borderEffectClass 
+                      ? `${borderEffectClass} ${isCurrentUser ? 'bg-amber-950/90' : 'bg-wood-900/90'}`
+                      : `rounded-xl border ${
+                          isCurrentUser 
+                            ? 'bg-amber-950/90 border-amber-400/80 ring-2 ring-amber-400/40 shadow-lg' 
+                            : 'bg-wood-900/80 border-amber-900/60 hover:border-amber-700'
+                        }`
                   }`}
+                  aria-label={`Rank ${rank}: ${entry.display_name || 'Adventurer'}, Level ${entry.current_level || 1}, Power Score ${entry.average_stat ?? entry.power_score ?? 10}${effectId ? ' (Equipped ' + effectId.replace('border_', '').replace('_', ' ') + ')' : ''}`}
                 >
                   {/* Left: Rank Badge & Player Avatar/Name */}
                   <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">

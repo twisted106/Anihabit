@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     current_xp NUMERIC DEFAULT 0 CHECK (current_xp >= 0),
     coin_balance INT DEFAULT 0 CHECK (coin_balance >= 0),
     reincarnation_meter NUMERIC DEFAULT 0 CHECK (reincarnation_meter >= 0 AND reincarnation_meter <= 100),
+    equipped_leaderboard_effect TEXT,
     created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -54,7 +55,9 @@ CREATE TABLE IF NOT EXISTS public.habits (
 CREATE TABLE IF NOT EXISTS public.items (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    category TEXT NOT NULL, -- 'title', 'avatar_frame', 'badge'
+    category TEXT NOT NULL DEFAULT 'border', -- 'border'
+    effect_type TEXT NOT NULL DEFAULT 'border' CHECK (effect_type IN ('border')),
+    tier TEXT NOT NULL DEFAULT 'Common', -- 'Common', 'Rare', 'Legendary'
     cost INT NOT NULL CHECK (cost >= 0),
     icon TEXT NOT NULL,
     description TEXT
@@ -566,7 +569,8 @@ RETURNS TABLE (
     intellect NUMERIC,
     strength NUMERIC,
     discipline NUMERIC,
-    willpower NUMERIC
+    willpower NUMERIC,
+    equipped_leaderboard_effect TEXT
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -579,7 +583,8 @@ BEGIN
         s.intellect,
         s.strength,
         s.discipline,
-        s.willpower
+        s.willpower,
+        p.equipped_leaderboard_effect
     FROM public.profiles p
     JOIN public.stats s ON p.id = s.user_id
     ORDER BY average_stat DESC
@@ -588,15 +593,142 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
+-- 7. BUY SHOP ITEM RPC (Server-side coin balance validation & atomic insert)
+CREATE OR REPLACE FUNCTION public.buy_shop_item(p_item_id TEXT)
+RETURNS JSONB AS $$
+DECLARE
+    v_user_id UUID;
+    v_cost INT;
+    v_current_coins INT;
+    v_already_owned BOOLEAN;
+BEGIN
+    v_user_id := auth.uid();
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'Not authenticated';
+    END IF;
+
+    -- Fetch item cost with validation
+    SELECT cost INTO v_cost
+    FROM public.items
+    WHERE id = p_item_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Item not found in catalog';
+    END IF;
+
+    -- Check if user already owns the item
+    SELECT EXISTS (
+        SELECT 1 FROM public.user_inventory
+        WHERE user_id = v_user_id AND item_id = p_item_id
+    ) INTO v_already_owned;
+
+    IF v_already_owned THEN
+        RAISE EXCEPTION 'Item already owned';
+    END IF;
+
+    -- Fetch user coins with row-level lock
+    SELECT coin_balance INTO v_current_coins
+    FROM public.profiles
+    WHERE id = v_user_id
+    FOR UPDATE;
+
+    IF v_current_coins < v_cost THEN
+        RAISE EXCEPTION 'Insufficient coins: need %, have %', v_cost, v_current_coins;
+    END IF;
+
+    -- Deduct coins
+    UPDATE public.profiles
+    SET coin_balance = coin_balance - v_cost
+    WHERE id = v_user_id;
+
+    -- Insert into user_inventory
+    INSERT INTO public.user_inventory (user_id, item_id, is_equipped)
+    VALUES (v_user_id, p_item_id, FALSE);
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'item_id', p_item_id,
+        'coins_spent', v_cost,
+        'remaining_coins', v_current_coins - v_cost
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- 8. TOGGLE EQUIP ITEM RPC (Server-side single-effect exclusivity)
+CREATE OR REPLACE FUNCTION public.toggle_equip_item(p_item_id TEXT)
+RETURNS JSONB AS $$
+DECLARE
+    v_user_id UUID;
+    v_is_currently_equipped BOOLEAN;
+    v_new_equipped_state BOOLEAN;
+BEGIN
+    v_user_id := auth.uid();
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'Not authenticated';
+    END IF;
+
+    -- Verify ownership
+    SELECT is_equipped INTO v_is_currently_equipped
+    FROM public.user_inventory
+    WHERE user_id = v_user_id AND item_id = p_item_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Item is not owned by user';
+    END IF;
+
+    v_new_equipped_state := NOT v_is_currently_equipped;
+
+    IF v_new_equipped_state THEN
+        -- Unequip any other border item first (only 1 equippable at once)
+        UPDATE public.user_inventory
+        SET is_equipped = FALSE
+        WHERE user_id = v_user_id;
+
+        -- Equip this item
+        UPDATE public.user_inventory
+        SET is_equipped = TRUE
+        WHERE user_id = v_user_id AND item_id = p_item_id;
+
+        -- Update profile equipped effect
+        UPDATE public.profiles
+        SET equipped_leaderboard_effect = p_item_id
+        WHERE id = v_user_id;
+    ELSE
+        -- Unequip this item
+        UPDATE public.user_inventory
+        SET is_equipped = FALSE
+        WHERE user_id = v_user_id AND item_id = p_item_id;
+
+        -- Clear profile equipped effect
+        UPDATE public.profiles
+        SET equipped_leaderboard_effect = NULL
+        WHERE id = v_user_id;
+    END IF;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'item_id', p_item_id,
+        'is_equipped', v_new_equipped_state,
+        'equipped_leaderboard_effect', CASE WHEN v_new_equipped_state THEN p_item_id ELSE NULL END
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
 -- =====================================================================
--- SEED DATA: COSMETIC ITEMS CATALOG
+-- SEED DATA: LEADERBOARD BORDER EFFECTS CATALOG
 -- =====================================================================
 
-INSERT INTO public.items (id, name, category, cost, icon, description) VALUES
-('title_novice', 'Novice Adventurer', 'title', 5, '⚔️', 'For those taking their first steps in discipline'),
-('title_scholar', 'Arcane Scholar', 'title', 15, '📜', 'Granted to masters of the Intellect realm'),
-('title_titan', 'Iron Titan', 'title', 25, '🛡️', 'Forged through unyielding physical effort'),
-('frame_ember', 'Ember Aura Frame', 'avatar_frame', 35, '🔥', 'A blazing red border radiating boundless energy'),
-('frame_astral', 'Astral Void Frame', 'avatar_frame', 50, '✨', 'A shimmering violet cosmic ring of sheer willpower'),
-('badge_conqueror', 'Dungeon Conqueror', 'badge', 60, '👑', 'Reserved for heroes who keep the reincarnation meter at zero')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO public.items (id, name, category, effect_type, tier, cost, icon, description) VALUES
+('border_iron_band', 'Iron Band', 'border', 'border', 'Common', 20, '⛓️', 'A simple, solid iron-gray border with a subtle carved inset.'),
+('border_bronze_sigil', 'Bronze Sigil Frame', 'border', 'border', 'Rare', 100, '⚜️', 'A thick bronze border styled with carved corner flourishes.'),
+('border_ember_rune', 'Ember Rune Border', 'border', 'border', 'Legendary', 500, '🔥', 'An animated glowing border of slow-moving deep red and orange embers.')
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    category = EXCLUDED.category,
+    effect_type = EXCLUDED.effect_type,
+    tier = EXCLUDED.tier,
+    cost = EXCLUDED.cost,
+    icon = EXCLUDED.icon,
+    description = EXCLUDED.description;

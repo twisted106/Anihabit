@@ -151,3 +151,88 @@
 .medallion-btn {
   @apply flex flex-col items-center justify-center transition-transform active:scale-95 focus:outline-none focus-visible:outline-none;
 }
+
+/* =====================================================================
+   LEADERBOARD COSMETIC BORDER EFFECTS
+   Pure CSS cosmetic borders applied to player rows in Guild Leaderboard
+   ===================================================================== */
+
+/* 1. Iron Band (Common) — Sturdy, rectangular, carved iron border */
+.leaderboard-border-iron {
+  border: 2px solid #4A4A4A !important;
+  border-radius: 0 !important;
+  box-shadow: 
+    inset 0 0 6px rgba(0, 0, 0, 0.9),
+    0 2px 5px rgba(0, 0, 0, 0.6) !important;
+  position: relative;
+}
+
+/* 2. Bronze Sigil Frame (Rare) — Thicker bronze with engraved corner flourishes */
+.leaderboard-border-bronze {
+  border: 3px solid #B08D57 !important;
+  border-radius: 4px !important;
+  box-shadow: 
+    inset 0 0 10px rgba(176, 141, 87, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.7) !important;
+  position: relative;
+}
+
+.leaderboard-border-bronze::before,
+.leaderboard-border-bronze::after {
+  content: '❖';
+  position: absolute;
+  color: #fae19a;
+  font-size: 10px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.95);
+  z-index: 10;
+}
+
+.leaderboard-border-bronze::before {
+  top: -5px;
+  left: 6px;
+}
+
+.leaderboard-border-bronze::after {
+  bottom: -5px;
+  right: 6px;
+}
+
+/* 3. Ember Rune Border (Legendary) — Slow, calm animated ember gradient (2.8s loop) */
+@keyframes ember-rune-flow {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 12px rgba(217, 83, 30, 0.45), inset 0 0 8px rgba(139, 46, 0, 0.5);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow: 0 0 18px rgba(242, 153, 74, 0.65), inset 0 0 12px rgba(217, 83, 30, 0.6);
+  }
+  100% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 12px rgba(217, 83, 30, 0.45), inset 0 0 8px rgba(139, 46, 0, 0.5);
+  }
+}
+
+.leaderboard-border-ember {
+  position: relative;
+  border-radius: 6px !important;
+  background: 
+    linear-gradient(to right, rgba(20, 10, 5, 0.95), rgba(12, 6, 3, 0.95)) padding-box,
+    linear-gradient(90deg, #8B2E00, #D9531E, #F2994A, #D9531E, #8B2E00) border-box !important;
+  background-size: 250% 250% !important;
+  border: 2.5px solid transparent !important;
+  animation: ember-rune-flow 2.8s ease-in-out infinite !important;
+}
+
+/* Accessibility: Unobstructed Focus Outlines (WCAG Compliance) */
+.leaderboard-border-iron:focus-visible,
+.leaderboard-border-bronze:focus-visible,
+.leaderboard-border-ember:focus-visible,
+.leaderboard-border-iron:focus-within,
+.leaderboard-border-bronze:focus-within,
+.leaderboard-border-ember:focus-within {
+  outline: 2px solid #fbbf24 !important;
+  outline-offset: 3px !important;
+}

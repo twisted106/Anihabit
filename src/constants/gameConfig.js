@@ -158,3 +158,43 @@ export const getMostRecentMidnightIST = () => {
   return new Date(istTime.getTime() - IST_OFFSET_MS);
 };
 
+// =====================================================================
+// LEADERBOARD COSMETIC BORDER EFFECTS (Shop Items)
+// Exclusively decorative, zero effect on stats, XP, coins, or rank.
+// =====================================================================
+export const LEADERBOARD_BORDER_ITEMS = [
+  {
+    id: 'border_iron_band',
+    name: 'Iron Band',
+    category: 'border',
+    effect_type: 'border',
+    tier: 'Common',
+    cost: 20,
+    icon: '⛓️',
+    description: 'A simple, solid iron-gray border with a subtle carved inset.',
+    cssClass: 'leaderboard-border-iron'
+  },
+  {
+    id: 'border_bronze_sigil',
+    name: 'Bronze Sigil Frame',
+    category: 'border',
+    effect_type: 'border',
+    tier: 'Rare',
+    cost: 100,
+    icon: '⚜️',
+    description: 'A thick bronze border styled with carved corner flourishes.',
+    cssClass: 'leaderboard-border-bronze'
+  },
+  {
+    id: 'border_ember_rune',
+    name: 'Ember Rune Border',
+    category: 'border',
+    effect_type: 'border',
+    tier: 'Legendary',
+    cost: 500,
+    icon: '🔥',
+    description: 'An animated glowing border of slow-moving deep red and orange embers.',
+    cssClass: 'leaderboard-border-ember'
+  }
+];
+

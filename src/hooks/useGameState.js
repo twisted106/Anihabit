@@ -21,7 +21,8 @@ import {
   CATEGORIES,
   calculateXpToNextLevel,
   calculatePowerScore,
-  getMostRecentMidnightIST
+  getMostRecentMidnightIST,
+  LEADERBOARD_BORDER_ITEMS
 } from '../constants/gameConfig';
 import { sound } from '../lib/audio';
 import confetti from 'canvas-confetti';
@@ -133,14 +134,22 @@ const DEMO_HABITS = [
   }
 ];
 
-const DEFAULT_SHOP_ITEMS = [
-  { id: 'title_novice', name: 'Novice Adventurer', category: 'title', cost: 5, icon: '⚔️', description: 'For those taking their first steps in discipline' },
-  { id: 'title_scholar', name: 'Arcane Scholar', category: 'title', cost: 15, icon: '📜', description: 'Granted to masters of the Intellect realm' },
-  { id: 'title_titan', name: 'Iron Titan', category: 'title', cost: 25, icon: '🛡️', description: 'Forged through unyielding physical effort' },
-  { id: 'frame_ember', name: 'Ember Aura Frame', category: 'avatar_frame', cost: 35, icon: '🔥', description: 'A blazing red border radiating boundless energy' },
-  { id: 'frame_astral', name: 'Astral Void Frame', category: 'avatar_frame', cost: 50, icon: '✨', description: 'A shimmering violet cosmic ring of sheer willpower' },
-  { id: 'badge_conqueror', name: 'Dungeon Conqueror', category: 'badge', cost: 60, icon: '👑', description: 'Reserved for heroes who keep the reincarnation meter at zero' }
-];
+const DEFAULT_SHOP_ITEMS = LEADERBOARD_BORDER_ITEMS;
+
+const getStoredInventory = () => {
+  try {
+    const raw = localStorage.getItem('anihabit_user_inventory');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveStoredInventory = (inv) => {
+  try {
+    localStorage.setItem('anihabit_user_inventory', JSON.stringify(inv));
+  } catch {}
+};
 
 export function useGameState() {
   // Session & Authentication
@@ -154,9 +163,7 @@ export function useGameState() {
   const [tasks, setTasks] = useState(DEMO_TASKS);
   const [habits, setHabits] = useState(DEMO_HABITS);
   const [shopItems, setShopItems] = useState(DEFAULT_SHOP_ITEMS);
-  const [userInventory, setUserInventory] = useState([
-    { item_id: 'title_novice', is_equipped: true }
-  ]);
+  const [userInventory, setUserInventory] = useState(getStoredInventory);
   const [leaderboard, setLeaderboard] = useState([]);
 
   // UI Modals & Notifications
@@ -236,13 +243,18 @@ export function useGameState() {
 
       if (habitsData) setHabits(habitsData);
 
-      // 5. Fetch Shop Items Catalog
+      // 5. Fetch Shop Items Catalog (Leaderboard Border Effects only)
       const { data: catalogData } = await supabase
         .from('items')
         .select('*');
 
       if (catalogData && catalogData.length > 0) {
-        setShopItems(catalogData);
+        const borderCatalog = catalogData.filter(
+          (i) => i.effect_type === 'border' || i.id?.startsWith('border_')
+        );
+        setShopItems(borderCatalog.length > 0 ? borderCatalog : LEADERBOARD_BORDER_ITEMS);
+      } else {
+        setShopItems(LEADERBOARD_BORDER_ITEMS);
       }
 
       // 6. Fetch User Inventory
@@ -251,7 +263,22 @@ export function useGameState() {
         .select('*')
         .eq('user_id', userId);
 
-      if (inventoryData) setUserInventory(inventoryData);
+      const localInv = getStoredInventory();
+      const remoteValid = (inventoryData || []).filter(inv => inv.item_id?.startsWith('border_'));
+
+      // Merge: remote takes precedence, but preserve local purchases if remote DB migration is pending
+      const mergedMap = new Map();
+      for (const item of localInv) {
+        if (item.item_id?.startsWith('border_')) {
+          mergedMap.set(item.item_id, item);
+        }
+      }
+      for (const item of remoteValid) {
+        mergedMap.set(item.item_id, item);
+      }
+      const finalInventory = Array.from(mergedMap.values());
+      setUserInventory(finalInventory);
+      saveStoredInventory(finalInventory);
 
     } catch (err) {
       console.error('Error hydrating game data from Supabase:', err);
@@ -312,17 +339,19 @@ export function useGameState() {
       }
     }
 
-    // Demo Leaderboard Mock Data
+    // Demo Leaderboard Mock Data (Showcasing Border Effects)
+    const activeEquippedBorder = userInventory.find((inv) => inv.is_equipped)?.item_id || profile?.equipped_leaderboard_effect || null;
+
     const mockRanks = [
-      { rank: 1, display_name: 'AetherMage', current_level: 12, average_stat: 48.5, intellect: 65, strength: 40, discipline: 45, willpower: 44 },
-      { rank: 2, display_name: 'ValkyriePrime', current_level: 10, average_stat: 41.2, intellect: 35, strength: 58, discipline: 38, willpower: 34 },
-      { rank: 3, display_name: sessionUser?.email ? sessionUser.email.split('@')[0] : 'Hero (You)', current_level: profile.current_level, average_stat: calculatePowerScore(stats), intellect: stats.intellect, strength: stats.strength, discipline: stats.discipline, willpower: stats.willpower },
-      { rank: 4, display_name: 'ShadowBlade', current_level: 8, average_stat: 28.0, intellect: 20, strength: 34, discipline: 32, willpower: 26 },
-      { rank: 5, display_name: 'ZenDisciple', current_level: 7, average_stat: 24.5, intellect: 22, strength: 18, discipline: 38, willpower: 20 }
+      { rank: 1, user_id: 'mock-1', display_name: 'AetherMage', current_level: 12, average_stat: 48.5, intellect: 65, strength: 40, discipline: 45, willpower: 44, equipped_leaderboard_effect: 'border_ember_rune' },
+      { rank: 2, user_id: 'mock-2', display_name: 'ValkyriePrime', current_level: 10, average_stat: 41.2, intellect: 35, strength: 58, discipline: 38, willpower: 34, equipped_leaderboard_effect: 'border_bronze_sigil' },
+      { rank: 3, user_id: sessionUser?.id || 'demo-hero-id', display_name: sessionUser?.email ? sessionUser.email.split('@')[0] : 'Hero (You)', current_level: profile.current_level, average_stat: calculatePowerScore(stats), intellect: stats.intellect, strength: stats.strength, discipline: stats.discipline, willpower: stats.willpower, equipped_leaderboard_effect: activeEquippedBorder },
+      { rank: 4, user_id: 'mock-4', display_name: 'ShadowBlade', current_level: 8, average_stat: 28.0, intellect: 20, strength: 34, discipline: 32, willpower: 26, equipped_leaderboard_effect: 'border_iron_band' },
+      { rank: 5, user_id: 'mock-5', display_name: 'ZenDisciple', current_level: 7, average_stat: 24.5, intellect: 22, strength: 18, discipline: 38, willpower: 20, equipped_leaderboard_effect: null }
     ].sort((a, b) => b.average_stat - a.average_stat).map((item, idx) => ({ ...item, rank: idx + 1 }));
 
     setLeaderboard(mockRanks);
-  }, [isDemoMode, sessionUser, profile.current_level, stats]);
+  }, [isDemoMode, sessionUser, profile.current_level, profile?.equipped_leaderboard_effect, userInventory, stats]);
 
   // =====================================================================
   // ACTIONS: TASK MANAGEMENT
@@ -813,7 +842,7 @@ export function useGameState() {
   }, [profile?.reincarnation_meter, isSupabaseConfigured, isDemoMode, sessionUser, setIsTradeoffModalOpen, notify]);
 
   // =====================================================================
-  // ACTIONS: COSMETICS SHOP & INVENTORY
+  // ACTIONS: COSMETICS SHOP & INVENTORY (Strict Single-Border Exclusivity)
   // =====================================================================
   const buyShopItem = useCallback(async (item) => {
     if (profile.coin_balance < item.cost) {
@@ -824,61 +853,93 @@ export function useGameState() {
     // Check if already owned
     const alreadyOwned = userInventory.some((inv) => inv.item_id === item.id);
     if (alreadyOwned) {
-      notify(`You already own "${item.name}"! Check your inventory.`, 'info', '🎒');
+      notify(`You already own "${item.name}"! Click "Equip Border" to adorn your row.`, 'info', '🎒');
       return false;
     }
 
     sound.playCoin();
 
+    // 1. Immediately update local inventory & coin balance for instantaneous UI feedback
+    const newInvItem = { item_id: item.id, is_equipped: false };
+    const nextInv = [...userInventory.filter(i => i.item_id !== item.id), newInvItem];
+    setUserInventory(nextInv);
+    saveStoredInventory(nextInv);
+    setProfile((prev) => ({ ...prev, coin_balance: Math.max(0, prev.coin_balance - item.cost) }));
+
+    notify(`Purchased "${item.name}"! Click "Equip Border" to adorn your leaderboard row.`, 'gold', '🛍️');
+
+    // 2. Synchronize to Supabase if connected
     if (isSupabaseConfigured && !isDemoMode && sessionUser) {
       try {
-        // Insert into user_inventory
-        const { error: invErr } = await supabase
-          .from('user_inventory')
-          .insert([{ user_id: sessionUser.id, item_id: item.id, is_equipped: false }]);
-        if (invErr) throw invErr;
-
-        // Deduct coins from profile
-        const { error: profErr } = await supabase
-          .from('profiles')
-          .update({ coin_balance: profile.coin_balance - item.cost })
-          .eq('id', sessionUser.id);
-        if (profErr) throw profErr;
-
-        refreshGameData(sessionUser.id);
-        notify(`Purchased "${item.name}"! Added to your inventory.`, 'gold', '🛍️');
-        return true;
+        const { error: rpcErr } = await supabase.rpc('buy_shop_item', { p_item_id: item.id });
+        if (rpcErr) {
+          // Direct table fallback
+          await supabase
+            .from('user_inventory')
+            .upsert([{ user_id: sessionUser.id, item_id: item.id, is_equipped: false }], { onConflict: 'user_id,item_id' });
+          await supabase
+            .from('profiles')
+            .update({ coin_balance: Math.max(0, profile.coin_balance - item.cost) })
+            .eq('id', sessionUser.id);
+        }
       } catch (err) {
-        console.error('Shop purchase error:', err);
-        notify('Failed to complete purchase', 'danger', '❌');
-        return false;
+        console.warn('Background Supabase purchase sync skipped or pending migration:', err);
       }
     }
 
-    // Local / Demo State
-    setProfile((prev) => ({ ...prev, coin_balance: prev.coin_balance - item.cost }));
-    setUserInventory((prev) => [...prev, { item_id: item.id, is_equipped: false }]);
-    notify(`Purchased "${item.name}"! Equipped in inventory.`, 'gold', '🛍️');
     return true;
-  }, [profile.coin_balance, userInventory, isDemoMode, sessionUser, refreshGameData, notify]);
+  }, [profile.coin_balance, userInventory, isDemoMode, sessionUser, notify]);
 
   const toggleEquipItem = useCallback(async (itemId) => {
     const targetItem = shopItems.find((i) => i.id === itemId);
     if (!targetItem) return;
 
-    setUserInventory((prev) =>
-      prev.map((inv) => {
-        const item = shopItems.find((i) => i.id === inv.item_id);
-        // Only one item of same category can be equipped at once
-        if (item?.category === targetItem.category) {
-          return { ...inv, is_equipped: inv.item_id === itemId ? !inv.is_equipped : false };
-        }
-        return inv;
-      })
+    // Determine target equipped state (toggle)
+    const isCurrentlyEquipped = userInventory.find((inv) => inv.item_id === itemId)?.is_equipped;
+    const willBeEquipped = !isCurrentlyEquipped;
+
+    // Strict Mutual Exclusivity: ONLY ONE BORDER EQUIPPED AT ANY TIME
+    const nextInventory = userInventory.map((inv) => {
+      if (inv.item_id === itemId) {
+        return { ...inv, is_equipped: willBeEquipped };
+      }
+      // Unequip all other border items
+      return willBeEquipped ? { ...inv, is_equipped: false } : inv;
+    });
+
+    // 1. Immediately update state and storage
+    setUserInventory(nextInventory);
+    saveStoredInventory(nextInventory);
+    setProfile((p) => ({
+      ...p,
+      equipped_leaderboard_effect: willBeEquipped ? itemId : null
+    }));
+
+    notify(
+      willBeEquipped 
+        ? `Equipped "${targetItem.name}" to your leaderboard row!` 
+        : `Unequipped "${targetItem.name}".`,
+      'info',
+      '🛡️'
     );
 
-    notify(`Inventory gear adjusted for "${targetItem.name}"`, 'info', '🛡️');
-  }, [shopItems, notify]);
+    // 2. Synchronize with Supabase in background
+    if (isSupabaseConfigured && !isDemoMode && sessionUser) {
+      try {
+        const { error: rpcErr } = await supabase.rpc('toggle_equip_item', { p_item_id: itemId });
+        if (rpcErr) {
+          // Direct table fallback
+          await supabase.from('user_inventory').update({ is_equipped: false }).eq('user_id', sessionUser.id);
+          if (willBeEquipped) {
+            await supabase.from('user_inventory').update({ is_equipped: true }).eq('user_id', sessionUser.id).eq('item_id', itemId);
+          }
+          await supabase.from('profiles').update({ equipped_leaderboard_effect: willBeEquipped ? itemId : null }).eq('id', sessionUser.id);
+        }
+      } catch (err) {
+        console.warn('Background Supabase equip sync skipped or pending migration:', err);
+      }
+    }
+  }, [shopItems, userInventory, isDemoMode, sessionUser, notify]);
 
   // Sign Out Handler
   const signOut = useCallback(async () => {
@@ -902,12 +963,10 @@ export function useGameState() {
   // Derived Values
   const powerScore = calculatePowerScore(stats);
   const xpNeeded = calculateXpToNextLevel(profile.current_level);
-  const equippedTitle = userInventory.find(
-    (inv) => inv.is_equipped && shopItems.find((i) => i.id === inv.item_id)?.category === 'title'
-  );
-  const equippedFrame = userInventory.find(
-    (inv) => inv.is_equipped && shopItems.find((i) => i.id === inv.item_id)?.category === 'avatar_frame'
-  );
+  const equippedLeaderboardEffect = 
+    userInventory.find((inv) => inv.is_equipped)?.item_id ||
+    profile?.equipped_leaderboard_effect ||
+    null;
 
   return {
     // Session & Connection
@@ -926,8 +985,9 @@ export function useGameState() {
     leaderboard,
     powerScore,
     xpNeeded,
-    equippedTitle: shopItems.find((i) => i.id === equippedTitle?.item_id)?.name || 'Initiate',
-    equippedFrame: shopItems.find((i) => i.id === equippedFrame?.item_id)?.id || null,
+    equippedLeaderboardEffect,
+    equippedTitle: 'Guild Champion',
+    equippedFrame: null,
 
     // Actions
     signOut,

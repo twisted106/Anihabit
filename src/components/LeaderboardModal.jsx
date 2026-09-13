@@ -80,10 +80,14 @@ export default function LeaderboardModal({
                   rankBadge = <Medal className="w-4 h-4 text-amber-600 inline" />;
                 }
 
+                const borderClass = player.equipped_leaderboard_effect === 'border_iron_band' ? 'leaderboard-border-iron' :
+                  player.equipped_leaderboard_effect === 'border_bronze_sigil' ? 'leaderboard-border-bronze' :
+                  player.equipped_leaderboard_effect === 'border_ember_rune' ? 'leaderboard-border-ember' : '';
+
                 return (
                   <tr
                     key={player.rank}
-                    className={`transition-colors ${
+                    className={`transition-colors ${borderClass} ${
                       isCurrentUser 
                         ? 'bg-indigo-950/40 font-bold text-indigo-200' 
                         : 'hover:bg-slate-800/40 text-slate-300'

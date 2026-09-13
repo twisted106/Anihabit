@@ -16,7 +16,7 @@ export default function DashboardView({
   profile,
   stats,
   habits = [],
-  equippedTitle = 'Novice Adventurer'
+  equippedTitle = 'Guild Champion'
 }) {
   const level = profile?.current_level || 1;
   const currentXp = Number(profile?.current_xp || 0);

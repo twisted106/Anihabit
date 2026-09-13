@@ -40,8 +40,7 @@ export default function App() {
     leaderboard,
     powerScore,
     xpNeeded,
-    equippedTitle,
-    equippedFrame,
+    equippedLeaderboardEffect,
 
     // Actions
     signOut,
@@ -141,7 +140,6 @@ export default function App() {
             profile={profile}
             stats={stats}
             habits={habits}
-            equippedTitle={equippedTitle}
           />
         )}
 
@@ -162,6 +160,7 @@ export default function App() {
             leaderboard={leaderboard}
             currentUserId={sessionUser?.id}
             powerScore={powerScore}
+            equippedLeaderboardEffect={equippedLeaderboardEffect}
           />
         )}
 
