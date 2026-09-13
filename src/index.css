@@ -157,73 +157,162 @@
    Pure CSS cosmetic borders applied to player rows in Guild Leaderboard
    ===================================================================== */
 
-/* 1. Iron Band (Common) — Sturdy, rectangular, carved iron border */
+/* =====================================================================
+   LEADERBOARD COSMETIC BORDER EFFECTS
+   High-contrast, prominent cosmetic borders applied to player rows in Guild Leaderboard
+   ===================================================================== */
+
+/* 1. Iron Band (Common) — Heavy 3.5px cold steel frame with metallic bevel & steel rivets */
 .leaderboard-border-iron {
-  border: 2px solid #4A4A4A !important;
-  border-radius: 0 !important;
+  border: 3.5px solid #94A3B8 !important;
+  border-radius: 0px !important;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.97) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
   box-shadow: 
-    inset 0 0 6px rgba(0, 0, 0, 0.9),
-    0 2px 5px rgba(0, 0, 0, 0.6) !important;
+    0 0 0 2px #1e293b,
+    inset 0 0 0 2px #475569,
+    0 0 16px rgba(148, 163, 184, 0.45),
+    inset 0 0 16px rgba(0, 0, 0, 0.95),
+    0 6px 16px rgba(0, 0, 0, 0.85) !important;
   position: relative;
 }
 
-/* 2. Bronze Sigil Frame (Rare) — Thicker bronze with engraved corner flourishes */
-.leaderboard-border-bronze {
-  border: 3px solid #B08D57 !important;
-  border-radius: 4px !important;
-  box-shadow: 
-    inset 0 0 10px rgba(176, 141, 87, 0.25),
-    0 4px 12px rgba(0, 0, 0, 0.7) !important;
-  position: relative;
-}
-
-.leaderboard-border-bronze::before,
-.leaderboard-border-bronze::after {
-  content: '❖';
+.leaderboard-border-iron::before {
+  content: '◆';
   position: absolute;
-  color: #fae19a;
-  font-size: 10px;
+  top: -8px;
+  left: 10px;
+  color: #E2E8F0;
+  font-size: 13px;
   line-height: 1;
   pointer-events: none;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.95);
+  text-shadow: 0 0 8px #94A3B8, 0 2px 4px rgba(0, 0, 0, 0.95);
   z-index: 10;
 }
 
+.leaderboard-border-iron::after {
+  content: '◆';
+  position: absolute;
+  bottom: -8px;
+  right: 10px;
+  color: #E2E8F0;
+  font-size: 13px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 8px #94A3B8, 0 2px 4px rgba(0, 0, 0, 0.95);
+  z-index: 10;
+}
+
+/* 2. Bronze Sigil Frame (Rare) — 4px radiant gilded bronze with radiant halo & golden sigils */
+.leaderboard-border-bronze {
+  border: 4px solid #D4AF37 !important;
+  border-radius: 6px !important;
+  background: linear-gradient(135deg, rgba(46, 26, 11, 0.97) 0%, rgba(26, 14, 6, 0.98) 100%) !important;
+  box-shadow: 
+    0 0 0 2px #5A3510,
+    0 0 24px rgba(212, 175, 55, 0.7),
+    inset 0 0 20px rgba(212, 175, 55, 0.35),
+    inset 0 0 0 2px #85531D,
+    0 6px 18px rgba(0, 0, 0, 0.9) !important;
+  position: relative;
+}
+
 .leaderboard-border-bronze::before {
-  top: -5px;
-  left: 6px;
+  content: '❖  ✦';
+  position: absolute;
+  top: -9px;
+  left: 12px;
+  color: #FFF275;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 10px #FFD700, 0 0 18px #D4AF37, 0 2px 4px #000;
+  z-index: 10;
 }
 
 .leaderboard-border-bronze::after {
-  bottom: -5px;
-  right: 6px;
+  content: '✦  ❖';
+  position: absolute;
+  bottom: -9px;
+  right: 12px;
+  color: #FFF275;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 10px #FFD700, 0 0 18px #D4AF37, 0 2px 4px #000;
+  z-index: 10;
 }
 
-/* 3. Ember Rune Border (Legendary) — Slow, calm animated ember gradient (2.8s loop) */
+/* 3. Ember Rune Border (Legendary) — 4.5px blazing dragonfire gradient with animated molten aura */
 @keyframes ember-rune-flow {
   0% {
     background-position: 0% 50%;
-    box-shadow: 0 0 12px rgba(217, 83, 30, 0.45), inset 0 0 8px rgba(139, 46, 0, 0.5);
+    box-shadow: 
+      0 0 22px rgba(255, 69, 0, 0.8),
+      0 0 48px rgba(255, 140, 0, 0.5),
+      inset 0 0 20px rgba(255, 69, 0, 0.55),
+      0 6px 20px rgba(0, 0, 0, 0.9);
   }
   50% {
     background-position: 100% 50%;
-    box-shadow: 0 0 18px rgba(242, 153, 74, 0.65), inset 0 0 12px rgba(217, 83, 30, 0.6);
+    box-shadow: 
+      0 0 34px rgba(255, 106, 0, 0.98),
+      0 0 68px rgba(255, 210, 0, 0.65),
+      inset 0 0 28px rgba(255, 80, 0, 0.7),
+      0 8px 25px rgba(0, 0, 0, 0.95);
   }
   100% {
     background-position: 0% 50%;
-    box-shadow: 0 0 12px rgba(217, 83, 30, 0.45), inset 0 0 8px rgba(139, 46, 0, 0.5);
+    box-shadow: 
+      0 0 22px rgba(255, 69, 0, 0.8),
+      0 0 48px rgba(255, 140, 0, 0.5),
+      inset 0 0 20px rgba(255, 69, 0, 0.55),
+      0 6px 20px rgba(0, 0, 0, 0.9);
   }
 }
 
 .leaderboard-border-ember {
   position: relative;
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   background: 
-    linear-gradient(to right, rgba(20, 10, 5, 0.95), rgba(12, 6, 3, 0.95)) padding-box,
-    linear-gradient(90deg, #8B2E00, #D9531E, #F2994A, #D9531E, #8B2E00) border-box !important;
-  background-size: 250% 250% !important;
-  border: 2.5px solid transparent !important;
+    linear-gradient(to right, rgba(30, 8, 4, 0.98), rgba(18, 4, 2, 0.98)) padding-box,
+    linear-gradient(90deg, #FF1A00, #FF6A00, #FFD200, #FF3D00, #FF1A00) border-box !important;
+  background-size: 200% 200% !important;
+  border: 4.5px solid transparent !important;
   animation: ember-rune-flow 2.8s ease-in-out infinite !important;
+}
+
+.leaderboard-border-ember::before {
+  content: '🔥 ᚱ';
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  color: #FFF275;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 10px #FF3D00, 0 0 20px #FF8C00, 0 2px 4px #000;
+  z-index: 10;
+}
+
+.leaderboard-border-ember::after {
+  content: 'ᚱ 🔥';
+  position: absolute;
+  bottom: -10px;
+  right: 12px;
+  color: #FFF275;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 10px #FF3D00, 0 0 20px #FF8C00, 0 2px 4px #000;
+  z-index: 10;
 }
 
 /* Accessibility: Unobstructed Focus Outlines (WCAG Compliance) */
@@ -233,6 +322,6 @@
 .leaderboard-border-iron:focus-within,
 .leaderboard-border-bronze:focus-within,
 .leaderboard-border-ember:focus-within {
-  outline: 2px solid #fbbf24 !important;
-  outline-offset: 3px !important;
+  outline: 3px solid #67e8f9 !important;
+  outline-offset: 5px !important;
 }

@@ -103,8 +103,41 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#120803] text-[#faecd1] font-garamond flex flex-col selection:bg-amber-800 selection:text-amber-100 antialiased pb-20 sm:pb-8">
+    <div className="min-h-screen bg-[#120803] text-[#faecd1] font-garamond flex flex-col selection:bg-amber-800 selection:text-amber-100 antialiased pb-20 sm:pb-8 relative">
       
+      {/* Main Full-Screen Background Image for Leaderboard Section */}
+      {activeTab === 'leaderboard' && (
+        <div 
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none transition-opacity duration-300"
+          style={{
+            backgroundImage: `linear-gradient(to bottom, rgba(14, 7, 3, 0.45), rgba(10, 5, 2, 0.35), rgba(14, 7, 3, 0.6)), url('/images/leaderboard_bg.png')`
+          }}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Main Full-Screen Background Image for Dashboard Section */}
+      {activeTab === 'dashboard' && (
+        <div 
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none transition-opacity duration-300"
+          style={{
+            backgroundImage: `linear-gradient(to bottom, rgba(14, 7, 3, 0.45), rgba(10, 5, 2, 0.35), rgba(14, 7, 3, 0.6)), url('/images/dashboard_bg.jpg')`
+          }}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Main Full-Screen Background Image for Shop Section */}
+      {activeTab === 'shop' && (
+        <div 
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none transition-opacity duration-300"
+          style={{
+            backgroundImage: `linear-gradient(to bottom, rgba(14, 7, 3, 0.45), rgba(10, 5, 2, 0.35), rgba(14, 7, 3, 0.6)), url('/images/shop_bg.jpg')`
+          }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* 1. Desktop & Tablet Top Navigation Header with 4 Medallions */}
       <Navbar 
         activeTab={activeTab}
@@ -119,7 +152,7 @@ export default function App() {
       />
 
       {/* 2. Main Tabletop Workspace (Renders the Selected Screen) */}
-      <main className="flex-1 w-full max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 relative">
+      <main className="flex-1 w-full max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 relative z-10">
         
         {/* SCREEN 2 — Game View (Default Tabletop Landing) */}
         {activeTab === 'gameview' && (
