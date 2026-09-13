@@ -142,38 +142,38 @@ const DEFAULT_SHOP_ITEMS = LEADERBOARD_BORDER_ITEMS;
 
 const getStoredInventory = () => {
   try {
-    const raw = localStorage.getItem('anihabit_user_inventory');
-    return raw ? JSON.parse(raw) : [];
+    const storedJson = localStorage.getItem('anihabit_user_inventory');
+    return storedJson ? JSON.parse(storedJson) : [];
   } catch {
     return [];
   }
 };
 
-const saveStoredInventory = (inv) => {
+const saveStoredInventory = (inventoryItems) => {
   try {
-    localStorage.setItem('anihabit_user_inventory', JSON.stringify(inv));
+    localStorage.setItem('anihabit_user_inventory', JSON.stringify(inventoryItems));
   } catch {}
 };
 
 const getDemoBossClaims = (cycleId) => {
   try {
-    const raw = localStorage.getItem(`demo_boss_defeat_claims_${cycleId}`);
-    return raw ? JSON.parse(raw) : [];
+    const storedJson = localStorage.getItem(`demo_boss_defeat_claims_${cycleId}`);
+    return storedJson ? JSON.parse(storedJson) : [];
   } catch {
     return [];
   }
 };
 
-const saveDemoBossClaims = (cycleId, claims) => {
+const saveDemoBossClaims = (cycleId, defeatedBossClaims) => {
   try {
-    localStorage.setItem(`demo_boss_defeat_claims_${cycleId}`, JSON.stringify(claims));
+    localStorage.setItem(`demo_boss_defeat_claims_${cycleId}`, JSON.stringify(defeatedBossClaims));
   } catch {}
 };
 
 const getStoredCustomProfile = () => {
   try {
-    const raw = localStorage.getItem('anihabit_custom_profile');
-    return raw ? JSON.parse(raw) : {};
+    const storedJson = localStorage.getItem('anihabit_custom_profile');
+    return storedJson ? JSON.parse(storedJson) : {};
   } catch {
     return {};
   }
@@ -220,10 +220,10 @@ export function useGameState() {
 
   // Toast Notification Dispatcher
   const notify = useCallback((message, type = 'info', icon = '✨') => {
-    const id = Date.now() + Math.random().toString(36).substring(2, 6);
-    setToasts((prev) => [...prev, { id, message, type, icon }]);
+    const toastId = Date.now() + Math.random().toString(36).substring(2, 6);
+    setToasts((prev) => [...prev, { id: toastId, message, type, icon }]);
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
+      setToasts((prev) => prev.filter((toast) => toast.id !== toastId));
     }, 4000);
   }, []);
 
@@ -312,22 +312,22 @@ export function useGameState() {
         .select('*')
         .eq('user_id', userId);
 
-      const localInv = getStoredInventory();
-      const remoteValid = (inventoryData || []).filter(inv => inv.item_id?.startsWith('border_'));
+      const localInventoryItems = getStoredInventory();
+      const validRemoteInventory = (inventoryData || []).filter(inventoryEntry => inventoryEntry.item_id?.startsWith('border_'));
 
       // Merge: remote takes precedence, but preserve local purchases if remote DB migration is pending
-      const mergedMap = new Map();
-      for (const item of localInv) {
-        if (item.item_id?.startsWith('border_')) {
-          mergedMap.set(item.item_id, item);
+      const mergedInventoryMap = new Map();
+      for (const inventoryEntry of localInventoryItems) {
+        if (inventoryEntry.item_id?.startsWith('border_')) {
+          mergedInventoryMap.set(inventoryEntry.item_id, inventoryEntry);
         }
       }
-      for (const item of remoteValid) {
-        mergedMap.set(item.item_id, item);
+      for (const inventoryEntry of validRemoteInventory) {
+        mergedInventoryMap.set(inventoryEntry.item_id, inventoryEntry);
       }
-      const finalInventory = Array.from(mergedMap.values());
-      setUserInventory(finalInventory);
-      saveStoredInventory(finalInventory);
+      const mergedInventory = Array.from(mergedInventoryMap.values());
+      setUserInventory(mergedInventory);
+      saveStoredInventory(mergedInventory);
 
       // 7. Fetch Boss Defeat Claims for Current Cycle
       const currentCycle = getCurrentLeaderboardCycleId();
@@ -339,7 +339,7 @@ export function useGameState() {
           .eq('cycle_id', currentCycle);
 
         if (claimsData) {
-          setClaimedBossesThisCycle(claimsData.map((c) => c.category));
+          setClaimedBossesThisCycle(claimsData.map((claimEntry) => claimEntry.category));
         }
       } catch (claimsErr) {
         console.warn('Could not fetch boss defeat claims:', claimsErr);
@@ -406,17 +406,17 @@ export function useGameState() {
     }
 
     // Demo Leaderboard Mock Data (Showcasing Border Effects)
-    const activeEquippedBorder = userInventory.find((inv) => inv.is_equipped)?.item_id || profile?.equipped_leaderboard_effect || null;
+    const activeEquippedBorder = userInventory.find((inventoryEntry) => inventoryEntry.is_equipped)?.item_id || profile?.equipped_leaderboard_effect || null;
 
-    const mockRanks = [
+    const mockLeaderboardRanks = [
       { rank: 1, user_id: 'mock-1', display_name: 'AetherMage', current_level: 12, average_stat: 48.5, intellect: 65, strength: 40, discipline: 45, willpower: 44, equipped_leaderboard_effect: 'border_ember_rune' },
       { rank: 2, user_id: 'mock-2', display_name: 'ValkyriePrime', current_level: 10, average_stat: 41.2, intellect: 35, strength: 58, discipline: 38, willpower: 34, equipped_leaderboard_effect: 'border_bronze_sigil' },
       { rank: 3, user_id: sessionUser?.id || 'demo-hero-id', display_name: profile.display_name || (sessionUser?.email ? sessionUser.email.split('@')[0] : 'Hero (You)'), current_level: profile.current_level, average_stat: calculatePowerScore(stats), intellect: stats.intellect, strength: stats.strength, discipline: stats.discipline, willpower: stats.willpower, equipped_leaderboard_effect: activeEquippedBorder },
       { rank: 4, user_id: 'mock-4', display_name: 'ShadowBlade', current_level: 8, average_stat: 28.0, intellect: 20, strength: 34, discipline: 32, willpower: 26, equipped_leaderboard_effect: 'border_iron_band' },
       { rank: 5, user_id: 'mock-5', display_name: 'ZenDisciple', current_level: 7, average_stat: 24.5, intellect: 22, strength: 18, discipline: 38, willpower: 20, equipped_leaderboard_effect: null }
-    ].sort((a, b) => b.average_stat - a.average_stat).map((item, idx) => ({ ...item, rank: idx + 1 }));
+    ].sort((rankA, rankB) => rankB.average_stat - rankA.average_stat).map((rankEntry, idx) => ({ ...rankEntry, rank: idx + 1 }));
 
-    setLeaderboard(mockRanks);
+    setLeaderboard(mockLeaderboardRanks);
   }, [isDemoMode, sessionUser, profile.current_level, profile.display_name, profile?.equipped_leaderboard_effect, userInventory, stats]);
 
   // =====================================================================
@@ -468,7 +468,7 @@ export function useGameState() {
   }, [isDemoMode, sessionUser, notify]);
 
   const completeTask = useCallback(async (taskId) => {
-    const targetTask = tasks.find((t) => t.id === taskId);
+    const targetTask = tasks.find((task) => task.id === taskId);
     if (!targetTask || targetTask.is_completed) return;
 
     sound.playTaskComplete();
@@ -482,7 +482,7 @@ export function useGameState() {
 
     // Check if category will be all clear after completing this task
     const remainingInCategory = tasks.filter(
-      (t) => t.category === targetTask.category && !t.is_completed && t.id !== taskId
+      (task) => task.category === targetTask.category && !task.is_completed && task.id !== taskId
     );
     const isCategoryAllClear = remainingInCategory.length === 0;
 
@@ -513,7 +513,7 @@ export function useGameState() {
               p_boss_name: bossInfo.name,
               p_cycle_id: currentCycle
             });
-          } catch (claimErr) {
+          } catch (rpcClaimError) {
             try {
               await supabase.from('boss_defeat_claims').insert([{
                 user_id: sessionUser.id,
@@ -522,7 +522,9 @@ export function useGameState() {
                 cycle_id: currentCycle,
                 reward_coins: BOSS_DEFEAT_COIN_REWARD
               }]);
-            } catch (fbErr) {}
+            } catch (fallbackInsertError) {
+              console.warn('Could not record boss defeat claim:', fallbackInsertError);
+            }
           }
         }
       } else {
@@ -559,11 +561,11 @@ export function useGameState() {
 
         if (coinsToAdd > 0) {
           try {
-            const { data: curProf } = await supabase.from('profiles').select('coin_balance').eq('id', sessionUser.id).single();
-            const curBal = Number(curProf?.coin_balance || 0);
-            await supabase.from('profiles').update({ coin_balance: curBal + coinsToAdd }).eq('id', sessionUser.id);
-          } catch (profErr) {
-            console.warn('Could not sync coin_balance to Supabase profiles:', profErr);
+            const { data: currentProfileData } = await supabase.from('profiles').select('coin_balance').eq('id', sessionUser.id).single();
+            const currentCoinBalance = Number(currentProfileData?.coin_balance || 0);
+            await supabase.from('profiles').update({ coin_balance: currentCoinBalance + coinsToAdd }).eq('id', sessionUser.id);
+          } catch (profileSyncError) {
+            console.warn('Could not sync coin_balance to Supabase profiles:', profileSyncError);
           }
         }
 
@@ -585,7 +587,7 @@ export function useGameState() {
 
     // Local / Demo State Update
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, is_completed: true, completed_at: new Date().toISOString() } : t))
+      prev.map((task) => (task.id === taskId ? { ...task, is_completed: true, completed_at: new Date().toISOString() } : task))
     );
 
     // Update Stats
@@ -632,7 +634,7 @@ export function useGameState() {
   // Reincarnation Bar increased by: Easy (+8), Medium (+9), Hard (+10)
   // Category Stat penalized by: Easy (-3), Medium (-2), Hard (-1)
   const failTask = useCallback(async (taskId) => {
-    const targetTask = tasks.find((t) => t.id === taskId);
+    const targetTask = tasks.find((task) => task.id === taskId);
     if (!targetTask || targetTask.is_completed) return;
 
     const diffConfig = DIFFICULTY_CONFIG[targetTask.difficulty] || DIFFICULTY_CONFIG.Easy;
@@ -644,7 +646,7 @@ export function useGameState() {
     const targetMeter = Math.min(100, currentMeter + pressureIncrease);
 
     // Remove task from active list
-    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
 
     // Deduct category stat with floor of 0
     setStats((prev) => ({
@@ -679,7 +681,7 @@ export function useGameState() {
         console.error('Delete task error:', err);
       }
     }
-    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
     notify('Task dismissed from quest journal', 'info', '🗑️');
   }, [isDemoMode, sessionUser, notify]);
 
@@ -762,12 +764,12 @@ export function useGameState() {
         console.error('Delete habit error:', err);
       }
     }
-    setHabits((prev) => prev.filter((h) => h.id !== habitId));
+    setHabits((prev) => prev.filter((habit) => habit.id !== habitId));
     notify('Habit banished from discipline ledger', 'info', '🗑️');
   }, [isDemoMode, sessionUser, notify]);
 
   const completeHabit = useCallback(async (habitId) => {
-    const targetHabit = habits.find((h) => h.id === habitId);
+    const targetHabit = habits.find((habit) => habit.id === habitId);
     if (!targetHabit) return { success: false, error: 'Habit not found' };
 
     // Check if already completed today (since most recent midnight IST boundary)
@@ -828,10 +830,10 @@ export function useGameState() {
     const newLongest = Math.max(targetHabit.longest_streak || 0, newStreak);
 
     setHabits((prev) =>
-      prev.map((h) =>
-        h.id === habitId
-          ? { ...h, current_streak: newStreak, longest_streak: newLongest, last_completed_at: now.toISOString() }
-          : h
+      prev.map((habit) =>
+        habit.id === habitId
+          ? { ...habit, current_streak: newStreak, longest_streak: newLongest, last_completed_at: now.toISOString() }
+          : habit
       )
     );
 
@@ -858,7 +860,7 @@ export function useGameState() {
   const handleHabitStreakBreak = useCallback(async (habitId, brokenCount = 1) => {
     // 1. Reset streak for target habit
     setHabits((prev) =>
-      prev.map((h) => (h.id === habitId ? { ...h, current_streak: 0 } : h))
+      prev.map((habit) => (habit.id === habitId ? { ...habit, current_streak: 0 } : habit))
     );
 
     // 2. Linear coin reduction
@@ -940,7 +942,7 @@ export function useGameState() {
     }
 
     // Check if already owned
-    const alreadyOwned = userInventory.some((inv) => inv.item_id === item.id);
+    const alreadyOwned = userInventory.some((inventoryEntry) => inventoryEntry.item_id === item.id);
     if (alreadyOwned) {
       notify(`You already own "${item.name}"! Click "Equip Border" to adorn your row.`, 'info', '🎒');
       return false;
@@ -949,10 +951,10 @@ export function useGameState() {
     sound.playCoin();
 
     // 1. Immediately update local inventory & coin balance for instantaneous UI feedback
-    const newInvItem = { item_id: item.id, is_equipped: false };
-    const nextInv = [...userInventory.filter(i => i.item_id !== item.id), newInvItem];
-    setUserInventory(nextInv);
-    saveStoredInventory(nextInv);
+    const newInventoryEntry = { item_id: item.id, is_equipped: false };
+    const updatedInventory = [...userInventory.filter((inventoryEntry) => inventoryEntry.item_id !== item.id), newInventoryEntry];
+    setUserInventory(updatedInventory);
+    saveStoredInventory(updatedInventory);
     setProfile((prev) => ({ ...prev, coin_balance: Math.max(0, prev.coin_balance - item.cost) }));
 
     notify(`Purchased "${item.name}"! Click "Equip Border" to adorn your leaderboard row.`, 'gold', '🛍️');
@@ -984,23 +986,23 @@ export function useGameState() {
     if (!targetItem) return;
 
     // Determine target equipped state (toggle)
-    const isCurrentlyEquipped = userInventory.find((inv) => inv.item_id === itemId)?.is_equipped;
+    const isCurrentlyEquipped = userInventory.find((inventoryEntry) => inventoryEntry.item_id === itemId)?.is_equipped;
     const willBeEquipped = !isCurrentlyEquipped;
 
     // Strict Mutual Exclusivity: ONLY ONE BORDER EQUIPPED AT ANY TIME
-    const nextInventory = userInventory.map((inv) => {
-      if (inv.item_id === itemId) {
-        return { ...inv, is_equipped: willBeEquipped };
+    const nextInventory = userInventory.map((inventoryEntry) => {
+      if (inventoryEntry.item_id === itemId) {
+        return { ...inventoryEntry, is_equipped: willBeEquipped };
       }
       // Unequip all other border items
-      return willBeEquipped ? { ...inv, is_equipped: false } : inv;
+      return willBeEquipped ? { ...inventoryEntry, is_equipped: false } : inventoryEntry;
     });
 
     // 1. Immediately update state and storage
     setUserInventory(nextInventory);
     saveStoredInventory(nextInventory);
-    setProfile((p) => ({
-      ...p,
+    setProfile((prevProfile) => ({
+      ...prevProfile,
       equipped_leaderboard_effect: willBeEquipped ? itemId : null
     }));
 
@@ -1092,7 +1094,7 @@ export function useGameState() {
   const powerScore = calculatePowerScore(stats);
   const xpNeeded = calculateXpToNextLevel(profile.current_level);
   const equippedLeaderboardEffect = 
-    userInventory.find((inv) => inv.is_equipped)?.item_id ||
+    userInventory.find((inventoryEntry) => inventoryEntry.is_equipped)?.item_id ||
     profile?.equipped_leaderboard_effect ||
     null;
 

@@ -182,15 +182,15 @@ export const getCurrentLeaderboardCycleId = () => {
   const istDate = new Date(now.getTime() + IST_OFFSET_MS);
 
   // ISO week calculation in IST
-  const target = new Date(istDate.valueOf());
-  const dayNr = (istDate.getUTCDay() + 6) % 7; // Monday = 0
-  target.setUTCDate(target.getUTCDate() - dayNr + 3);
-  const firstThursday = target.valueOf();
-  target.setUTCMonth(0, 1);
-  if (target.getUTCDay() !== 4) {
-    target.setUTCMonth(0, 1 + ((4 - target.getUTCDay() + 7) % 7));
+  const isoWeekThursday = new Date(istDate.valueOf());
+  const dayOffsetFromMonday = (istDate.getUTCDay() + 6) % 7; // Monday = 0
+  isoWeekThursday.setUTCDate(isoWeekThursday.getUTCDate() - dayOffsetFromMonday + 3);
+  const firstThursdayTimestamp = isoWeekThursday.valueOf();
+  isoWeekThursday.setUTCMonth(0, 1);
+  if (isoWeekThursday.getUTCDay() !== 4) {
+    isoWeekThursday.setUTCMonth(0, 1 + ((4 - isoWeekThursday.getUTCDay() + 7) % 7));
   }
-  const weekNumber = 1 + Math.ceil((firstThursday - target) / 604800000);
+  const weekNumber = 1 + Math.ceil((firstThursdayTimestamp - isoWeekThursday) / 604800000);
   return `${istDate.getUTCFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
 };
 
