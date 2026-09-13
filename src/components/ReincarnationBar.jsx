@@ -9,8 +9,7 @@ import { RECEIVE_ON_FAIL, REDUCE_ON_COMPLETE, REINCARNATION_MAX } from '../const
  */
 export default function ReincarnationBar({
   meterValue = 0,
-  onOpenTradeoffModal,
-  onAdjustPressure
+  onOpenTradeoffModal
 }) {
   const clampedValue = Math.min(REINCARNATION_MAX, Math.max(0, Math.round(meterValue)));
   const percentage = (clampedValue / REINCARNATION_MAX) * 100;
@@ -25,7 +24,9 @@ export default function ReincarnationBar({
     >
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
         <div className="flex items-center space-x-2">
-          <Flame className="w-4 h-4 text-amber-400 shrink-0" />
+          <span className="text-amber-400 text-base flame-glow" role="img" aria-label="Flame">
+            🔥
+          </span>
           <h2 
             id="pressure-meter-label"
             className="font-cinzel font-black text-xs sm:text-sm uppercase tracking-widest text-amber-200 drop-shadow"
@@ -41,91 +42,8 @@ export default function ReincarnationBar({
           </span>
         </div>
 
-        {/* Action & Testing Controls */}
+        {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Demo Reincarnation Testing Button Group */}
-          {onAdjustPressure && (
-            <div className="flex flex-wrap items-center gap-1.5 bg-black/60 border border-amber-700/60 px-2 py-1 rounded-lg shadow-inner">
-              <span className="text-[10px] font-cinzel text-amber-400/90 uppercase tracking-wider font-bold mr-0.5">
-                Demo Test:
-              </span>
-
-              {/* Simulate Task Fail: Hard (+8), Medium (+9), Easy (+10) */}
-              <button
-                type="button"
-                onClick={() => onAdjustPressure(8)}
-                className="px-1.5 py-0.5 rounded bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title="Simulate Hard task fail (+8 Pressure)"
-              >
-                +8% (Fail Hard)
-              </button>
-              <button
-                type="button"
-                onClick={() => onAdjustPressure(9)}
-                className="px-1.5 py-0.5 rounded bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title="Simulate Medium task fail (+9 Pressure)"
-              >
-                +9% (Fail Med)
-              </button>
-              <button
-                type="button"
-                onClick={() => onAdjustPressure(10)}
-                className="px-1.5 py-0.5 rounded bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title="Simulate Easy task fail (+10 Pressure)"
-              >
-                +10% (Fail Easy)
-              </button>
-
-              {/* Simulate Task Complete: Hard (-3), Medium (-2), Easy (-1) */}
-              <button
-                type="button"
-                onClick={() => onAdjustPressure(-3)}
-                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title="Simulate Hard task complete (-3 Pressure)"
-              >
-                -3% (Done Hard)
-              </button>
-              <button
-                type="button"
-                onClick={() => onAdjustPressure(-2)}
-                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title="Simulate Medium task complete (-2 Pressure)"
-              >
-                -2% (Done Med)
-              </button>
-              <button
-                type="button"
-                onClick={() => onAdjustPressure(-1)}
-                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title="Simulate Easy task complete (-1 Pressure)"
-              >
-                -1% (Done Easy)
-              </button>
-
-              {/* Button 2: Immediate 100% Crisis Trigger */}
-              <button
-                type="button"
-                onClick={() => onAdjustPressure(100)}
-                className="px-2.5 py-0.5 rounded bg-gradient-to-r from-red-700 to-amber-600 hover:from-red-600 hover:to-amber-500 text-amber-100 hover:text-white border border-amber-400/80 text-[10px] font-cinzel font-black shadow transition-all active:scale-95 cursor-pointer focus:outline-none"
-                title="Immediately surge pressure to 100% to test the Crisis Dilemma Modal"
-              >
-                Test 100% Crisis
-              </button>
-
-              {/* Button 3: Reset to 0% */}
-              {clampedValue > 0 && (
-                <button
-                  type="button"
-                  onClick={() => onAdjustPressure(-clampedValue)}
-                  className="px-1.5 py-0.5 rounded bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white border border-stone-700 text-[10px] font-cinzel font-bold transition-all active:scale-95 cursor-pointer focus:outline-none"
-                  title="Reset reincarnation pressure back to 0%"
-                >
-                  ↺ Reset 0%
-                </button>
-              )}
-            </div>
-          )}
-
           {/* High-Pressure Warning Alert */}
           {percentage >= 70 && (
             <button

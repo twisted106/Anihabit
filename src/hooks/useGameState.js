@@ -215,15 +215,13 @@ export function useGameState() {
   // UI Modals & Notifications
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
-  const [isShopModalOpen, setIsShopModalOpen] = useState(false);
-  const [isLeaderboardModalOpen, setIsLeaderboardModalOpen] = useState(false);
   const [isTradeoffModalOpen, setIsTradeoffModalOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
   // Toast Notification Dispatcher
-  const notify = useCallback((message, type = 'info') => {
+  const notify = useCallback((message, type = 'info', icon = '✨') => {
     const id = Date.now() + Math.random().toString(36).substring(2, 6);
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, message, type, icon }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 4000);
@@ -234,7 +232,7 @@ export function useGameState() {
     if (profile.reincarnation_meter >= REINCARNATION_MAX && !isTradeoffModalOpen) {
       sound.playTradeoffAlert();
       setIsTradeoffModalOpen(true);
-      notify('CRITICAL ALERT: Reincarnation meter at maximum capacity! A sacrifice is demanded.', 'danger');
+      notify('CRITICAL ALERT: Reincarnation meter at maximum capacity! A sacrifice is demanded.', 'danger', '⚠️');
     }
   }, [profile.reincarnation_meter, isTradeoffModalOpen, notify]);
 
@@ -349,7 +347,7 @@ export function useGameState() {
 
     } catch (err) {
       console.error('Error hydrating game data from Supabase:', err);
-      notify('Failed to sync remote data. Running in offline view.', 'warning');
+      notify('Failed to sync remote data. Running in offline view.', 'warning', '📡');
     } finally {
       setIsLoading(false);
     }
@@ -426,7 +424,7 @@ export function useGameState() {
   // =====================================================================
   const createTask = useCallback(async ({ title, category, difficulty }) => {
     if (!title?.trim()) {
-      notify('Please enter a task title', 'warning');
+      notify('Please enter a task title', 'warning', '⚠️');
       return false;
     }
 
@@ -459,13 +457,13 @@ export function useGameState() {
         if (data) newTask.id = data.id;
       } catch (err) {
         console.error('Task insertion error:', err);
-        notify('Failed to save task to database', 'danger');
+        notify('Failed to save task to database', 'danger', '❌');
         return false;
       }
     }
 
     setTasks((prev) => [newTask, ...prev]);
-    notify(`Quest registered: "${title}" (${category} - ${difficulty})`, 'success');
+    notify(`Quest registered: "${title}" (${category} - ${difficulty})`, 'success', '⚔️');
     return true;
   }, [isDemoMode, sessionUser, notify]);
 
@@ -502,7 +500,7 @@ export function useGameState() {
         coinsToAdd = BOSS_DEFEAT_COIN_REWARD;
         confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
         sound.playPurchase?.();
-        notify(`BOSS DEFEATED: ${bossInfo.name} subdued! +${BOSS_DEFEAT_COIN_REWARD} Gold Coins claimed! (Cycle ${currentCycle})`, 'gold');
+        notify(`👑 BOSS DEFEATED: ${bossInfo.name} subdued! +${BOSS_DEFEAT_COIN_REWARD} Gold Coins claimed! (Cycle ${currentCycle})`, 'gold', '💰');
 
         const nextClaims = [...claimedBossesThisCycle.filter((c) => c !== targetTask.category), targetTask.category];
         setClaimedBossesThisCycle(nextClaims);
@@ -530,7 +528,7 @@ export function useGameState() {
       } else {
         // Repeat Defeat in same cycle: 0 additional coins (Loophole Closed)
         confetti({ particleCount: 40, spread: 40, origin: { y: 0.7 } });
-        notify(`${targetTask.category} realm cleared! (${bossInfo.name} bounty already claimed for cycle ${currentCycle})`, 'gold');
+        notify(`⚔️ ${targetTask.category} realm cleared! (${bossInfo.name} bounty already claimed for cycle ${currentCycle})`, 'gold', '🌟');
       }
     }
 
@@ -545,7 +543,7 @@ export function useGameState() {
         const { data, error } = await supabase.rpc('complete_task', { p_task_id: taskId });
         if (error) {
           console.error('complete_task RPC failed:', error);
-          notify('Server error completing task', 'danger');
+          notify('Server error completing task', 'danger', '❌');
           return;
         }
 
@@ -578,7 +576,7 @@ export function useGameState() {
           coin_balance: Math.max(Number(prev?.coin_balance || 0), Number(profile?.coin_balance || 0) + coinsToAdd)
         }));
 
-        notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success');
+        notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success', '✨');
         return;
       } catch (err) {
         console.error('complete_task error:', err);
@@ -613,7 +611,7 @@ export function useGameState() {
       if (didLevelUp) {
         sound.playLevelUp();
         confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-        notify(`HEROIC ADVANCEMENT! Reached Level ${currentLevel}!`, 'gold');
+        notify(`HEROIC ADVANCEMENT! Reached Level ${currentLevel}!`, 'gold', '👑');
       }
 
       return {
@@ -627,7 +625,7 @@ export function useGameState() {
       };
     });
 
-    notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success');
+    notify(`Task Completed! +${totalXpGain} XP, +${totalStatGain} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure -${pressureRelief}`, 'success', '🛡️');
   }, [tasks, profile?.reincarnation_meter, profile?.coin_balance, isDemoMode, sessionUser, refreshGameData, notify, claimedBossesThisCycle]);
 
   // Expire / Fail Task (When task is not completed / 24h expires)
@@ -670,7 +668,7 @@ export function useGameState() {
       }
     }
 
-    notify(`Task Uncompleted / Expired! -${statPenalty} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure +${pressureIncrease}`, 'danger');
+    notify(`Task Uncompleted / Expired! -${statPenalty} ${CATEGORIES[targetTask.category]?.statLabel} | Pressure +${pressureIncrease}`, 'danger', '💀');
   }, [tasks, stats, profile?.reincarnation_meter, isSupabaseConfigured, isDemoMode, sessionUser, notify]);
 
   const deleteTask = useCallback(async (taskId) => {
@@ -682,7 +680,7 @@ export function useGameState() {
       }
     }
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
-    notify('Task dismissed from quest journal', 'info');
+    notify('Task dismissed from quest journal', 'info', '🗑️');
   }, [isDemoMode, sessionUser, notify]);
 
   // =====================================================================
@@ -710,7 +708,7 @@ export function useGameState() {
     const category = typeof titleOrObj === 'object' && titleOrObj !== null ? titleOrObj?.category : maybeCategory;
 
     if (!title?.trim()) {
-      notify('Please enter a habit title', 'warning');
+      notify('Please enter a habit title', 'warning', '⚠️');
       return false;
     }
 
@@ -746,13 +744,13 @@ export function useGameState() {
         if (data) newHabit.id = data.id;
       } catch (err) {
         console.error('Habit insertion error:', err);
-        notify('Failed to save habit', 'danger');
+        notify('Failed to save habit', 'danger', '❌');
         return false;
       }
     }
 
     setHabits((prev) => [newHabit, ...prev]);
-    notify(`Habit forged: "${title}" (${habitCategory})`, 'success');
+    notify(`Habit forged: "${title}" (${habitCategory})`, 'success', '🔥');
     return true;
   }, [isDemoMode, sessionUser, notify]);
 
@@ -765,7 +763,7 @@ export function useGameState() {
       }
     }
     setHabits((prev) => prev.filter((h) => h.id !== habitId));
-    notify('Habit banished from discipline ledger', 'info');
+    notify('Habit banished from discipline ledger', 'info', '🗑️');
   }, [isDemoMode, sessionUser, notify]);
 
   const completeHabit = useCallback(async (habitId) => {
@@ -795,7 +793,7 @@ export function useGameState() {
             return { success: false, reason: 'already_completed' };
           }
           console.error('complete_habit RPC error:', error);
-          notify(error.message || 'Error checking in habit', 'danger');
+          notify(error.message || 'Error checking in habit', 'danger', '❌');
           return { success: false, error };
         }
         if (data) {
@@ -816,7 +814,7 @@ export function useGameState() {
           // Refresh habits state from database
           await fetchHabits();
 
-          notify(`Streak ${data.current_streak} Days! Earned +${data.coins_awarded} Gold Coins!`, 'gold');
+          notify(`Streak ${data.current_streak} Days! Earned +${data.coins_awarded} Gold Coins!`, 'gold', '🪙');
           return data;
         }
       } catch (err) {
@@ -843,7 +841,7 @@ export function useGameState() {
       reincarnation_meter: Math.max(0, (prev.reincarnation_meter || 0) - HABIT_PRESSURE_RELIEF)
     }));
 
-    notify(`Streak increased to ${newStreak}! +${coinsAwarded} Gold Coins | Pressure -${HABIT_PRESSURE_RELIEF}`, 'gold');
+    notify(`Streak increased to ${newStreak}! +${coinsAwarded} Gold Coins | Pressure -${HABIT_PRESSURE_RELIEF}`, 'gold', '🪙');
     return {
       success: true,
       coins_awarded: coinsAwarded,
@@ -887,7 +885,7 @@ export function useGameState() {
       }
     }
 
-    notify(`Streak severed! Lost ${lostCoins} Coins (${Math.round((1 - retentionRate) * 100)}%) | Pressure +${HABIT_STREAK_BREAK_PRESSURE}`, 'danger');
+    notify(`Streak severed! Lost ${lostCoins} Coins (${Math.round((1 - retentionRate) * 100)}%) | Pressure +${HABIT_STREAK_BREAK_PRESSURE}`, 'danger', '💔');
   }, [isSupabaseConfigured, isDemoMode, sessionUser, notify]);
 
 
@@ -903,7 +901,7 @@ export function useGameState() {
         if (data) {
           refreshGameData(sessionUser.id);
           setIsTradeoffModalOpen(false);
-          notify('Reincarnation crisis resolved. Pressure reset to 0.', 'info');
+          notify('Reincarnation crisis resolved. Pressure reset to 0.', 'info', '⚖️');
           return;
         }
       } catch (err) {
@@ -919,13 +917,13 @@ export function useGameState() {
         discipline: Math.round(prev.discipline * (1 - REINCARNATION_STAT_SACRIFICE_PERCENT)),
         willpower: Math.round(prev.willpower * (1 - REINCARNATION_STAT_SACRIFICE_PERCENT))
       }));
-      notify('Sacrificed 25% of all Stats to reset the Reincarnation pressure.', 'warning');
+      notify('Sacrificed 25% of all Stats to reset the Reincarnation pressure.', 'warning', '📉');
     } else {
       setProfile((prev) => ({
         ...prev,
         coin_balance: Math.round(prev.coin_balance * (1 - REINCARNATION_COIN_SACRIFICE_PERCENT))
       }));
-      notify('Sacrificed 50% of Coin pouch to satisfy the Reincarnation debt.', 'warning');
+      notify('Sacrificed 50% of Coin pouch to satisfy the Reincarnation debt.', 'warning', '💰');
     }
 
     setProfile((prev) => ({ ...prev, reincarnation_meter: 0 }));
@@ -933,46 +931,18 @@ export function useGameState() {
   }, [isDemoMode, sessionUser, refreshGameData, notify]);
 
   // =====================================================================
-  // ACTIONS: REINCARNATION TESTING HELPER
-  // =====================================================================
-  const adjustReincarnationPressure = useCallback(async (amount) => {
-    const current = Number(profile?.reincarnation_meter || 0);
-    const newMeter = Math.min(100, Math.max(0, current + amount));
-    setProfile((prev) => ({ ...prev, reincarnation_meter: newMeter }));
-
-    if (isSupabaseConfigured && !isDemoMode && sessionUser) {
-      try {
-        await supabase.from('profiles').update({ reincarnation_meter: newMeter }).eq('id', sessionUser.id);
-      } catch (err) {
-        console.warn('Could not sync demo reincarnation_meter change to database:', err);
-      }
-    }
-
-    if (newMeter >= 100) {
-      setIsTradeoffModalOpen(true);
-      notify('Reincarnation Pressure reached 100%! Crisis initiated!', 'danger');
-    } else if (amount > 0) {
-      notify(`Simulated missed task: +${amount}% Pressure (Current: ${newMeter}%)`, 'warning');
-    } else if (amount < 0 && newMeter === 0) {
-      notify('Reincarnation Pressure reset to 0%', 'info');
-    } else {
-      notify(`Reincarnation pressure set to ${newMeter}%`, 'info');
-    }
-  }, [profile?.reincarnation_meter, isSupabaseConfigured, isDemoMode, sessionUser, setIsTradeoffModalOpen, notify]);
-
-  // =====================================================================
   // ACTIONS: COSMETICS SHOP & INVENTORY (Strict Single-Border Exclusivity)
   // =====================================================================
   const buyShopItem = useCallback(async (item) => {
     if (profile.coin_balance < item.cost) {
-      notify(`Insufficient coins! You need ${item.cost} coins but have ${profile.coin_balance}. Complete daily habits to earn more!`, 'warning');
+      notify(`Insufficient coins! You need ${item.cost} coins but have ${profile.coin_balance}. Complete daily habits to earn more!`, 'warning', '🪙');
       return false;
     }
 
     // Check if already owned
     const alreadyOwned = userInventory.some((inv) => inv.item_id === item.id);
     if (alreadyOwned) {
-      notify(`You already own "${item.name}"! Click "Equip Border" to adorn your row.`, 'info');
+      notify(`You already own "${item.name}"! Click "Equip Border" to adorn your row.`, 'info', '🎒');
       return false;
     }
 
@@ -985,7 +955,7 @@ export function useGameState() {
     saveStoredInventory(nextInv);
     setProfile((prev) => ({ ...prev, coin_balance: Math.max(0, prev.coin_balance - item.cost) }));
 
-    notify(`Purchased "${item.name}"! Click "Equip Border" to adorn your leaderboard row.`, 'gold');
+    notify(`Purchased "${item.name}"! Click "Equip Border" to adorn your leaderboard row.`, 'gold', '🛍️');
 
     // 2. Synchronize to Supabase if connected
     if (isSupabaseConfigured && !isDemoMode && sessionUser) {
@@ -1038,7 +1008,9 @@ export function useGameState() {
       willBeEquipped 
         ? `Equipped "${targetItem.name}" to your leaderboard row!` 
         : `Unequipped "${targetItem.name}".`,
-      'info');
+      'info',
+      '🛡️'
+    );
 
     // 2. Synchronize with Supabase in background
     if (isSupabaseConfigured && !isDemoMode && sessionUser) {
@@ -1112,7 +1084,7 @@ export function useGameState() {
       setStats(DEMO_STATS);
       setTasks(DEMO_TASKS);
       setHabits(DEMO_HABITS);
-      notify('You have departed the tavern. Returned to guest mode.', 'info');
+      notify('You have departed the tavern. Returned to guest mode.', 'info', '🚪');
     }
   }, [notify]);
 
@@ -1161,7 +1133,6 @@ export function useGameState() {
     checkInHabit,
     handleHabitStreakBreak,
     resolveTradeoff,
-    adjustReincarnationPressure,
     buyShopItem,
     toggleEquipItem,
     fetchLeaderboard,
@@ -1175,10 +1146,6 @@ export function useGameState() {
     setIsAuthModalOpen,
     isCreateTaskModalOpen,
     setIsCreateTaskModalOpen,
-    isShopModalOpen,
-    setIsShopModalOpen,
-    isLeaderboardModalOpen,
-    setIsLeaderboardModalOpen,
     isTradeoffModalOpen,
     setIsTradeoffModalOpen,
     toasts,

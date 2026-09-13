@@ -56,7 +56,6 @@ export default function App() {
     completeHabit,
     checkInHabit,
     resolveTradeoff,
-    adjustReincarnationPressure,
     buyShopItem,
     toggleEquipItem,
     fetchLeaderboard,
@@ -187,7 +186,6 @@ export default function App() {
               setIsCreateTaskModalOpen(true);
             }}
             onOpenTradeoffModal={() => setIsTradeoffModalOpen(true)}
-            onAdjustPressure={adjustReincarnationPressure}
             onCompleteHabit={completeHabit}
             onDeleteHabit={deleteHabit}
             onOpenCustomizeProfile={() => setIsCustomizeProfileModalOpen(true)}
