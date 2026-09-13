@@ -11,7 +11,8 @@ import {
   Sparkles, 
   Flame, 
   Shield, 
-  Check 
+  Check,
+  Scroll 
 } from 'lucide-react';
 import { DIFFICULTY_CONFIG, getMostRecentMidnightIST } from '../constants/gameConfig';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -306,67 +307,71 @@ export default function CardDetailModal({
                 return (
                   <div 
                     key={task.id}
-                    className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                    className={`p-2.5 sm:p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 ${
                       isCompleted 
                         ? 'bg-[#140c06]/80 border-stone-800 opacity-60'
                         : 'bg-gradient-to-r from-[#201208]/90 via-[#180d05]/90 to-[#120703]/90 border-amber-700/60 hover:border-amber-400 hover:shadow-md'
                     }`}
                   >
-                    {/* Left: Checkbox Toggle */}
-                    <button
-                      type="button"
-                      onClick={() => !isCompleted && handleMarkComplete(task.id)}
-                      disabled={isCompleted}
-                      className="p-1 rounded text-amber-400 hover:text-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-colors cursor-pointer disabled:cursor-not-allowed"
-                      title={isCompleted ? 'Task completed' : 'Mark task completed'}
-                      aria-label={`Mark task ${task.title} as completed`}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                      ) : (
-                        <Circle className="w-5 h-5 text-amber-400/80 hover:text-amber-200" />
-                      )}
-                    </button>
-
-                    {/* Middle: Task Name & Category Tag */}
-                    <div className="flex-1 min-w-0">
-                      <div className={`text-xs sm:text-sm font-garamond font-bold truncate ${
-                        isCompleted ? 'line-through text-stone-400' : 'text-parchment-200'
-                      }`}>
-                        {task.title}
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-[10px] text-stone-400 font-cinzel">
-                        <span className="text-amber-300/90 font-semibold">{task.difficulty}</span>
-                        <span>·</span>
-                        <span className="flex items-center gap-0.5 text-stone-400">
-                          <Clock className="w-3 h-3 text-stone-500 inline" />
-                          24h rolling timer
-                        </span>
-                        {isCompleted && (
-                          <span className="text-emerald-400 font-bold ml-1">
-                            ✓ Completed
-                          </span>
+                    {/* Left: Checkbox & Task Name */}
+                    <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+                      {/* Checkbox Toggle */}
+                      <button
+                        type="button"
+                        onClick={() => !isCompleted && handleMarkComplete(task.id)}
+                        disabled={isCompleted}
+                        className="w-10 h-10 flex items-center justify-center shrink-0 rounded-lg text-amber-400 hover:text-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                        title={isCompleted ? 'Task completed' : 'Mark task completed'}
+                        aria-label={`Mark task ${task.title} as completed`}
+                      >
+                        {isCompleted ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                        ) : (
+                          <Circle className="w-5 h-5 text-amber-400/80 hover:text-amber-200" />
                         )}
+                      </button>
+
+                      {/* Task Name & Metadata */}
+                      <div className="min-w-0 flex-1">
+                        <div className={`text-xs sm:text-sm font-garamond font-bold truncate ${
+                          isCompleted ? 'line-through text-stone-400' : 'text-parchment-200'
+                        }`}>
+                          {task.title}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-0.5 text-[10px] text-stone-400 font-cinzel">
+                          <span className="text-amber-300/90 font-semibold">{task.difficulty}</span>
+                          <span>·</span>
+                          <span className="flex items-center gap-0.5 text-stone-400">
+                            <Clock className="w-3 h-3 text-stone-500 inline" />
+                            24h timer
+                          </span>
+                          {isCompleted && (
+                            <span className="text-emerald-400 font-bold inline-flex items-center gap-0.5">
+                              <Check className="w-3 h-3" />
+                              <span>Completed</span>
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Right: Two Stacked Badges (Reward & Penalty) */}
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    {/* Right: Badges & Fail Action */}
+                    <div className="flex flex-wrap sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1.5 shrink-0 pl-12 sm:pl-0">
                       {/* Reward Badge */}
-                      <span className="px-2 py-0.5 rounded bg-emerald-950/90 border border-emerald-500/50 text-[10px] font-cinzel font-bold text-emerald-300 shadow">
+                      <span className="px-2 py-0.5 rounded bg-emerald-950/90 border border-emerald-500/50 text-[9px] sm:text-[10px] font-cinzel font-bold text-emerald-300 shadow">
                         +{diff.xp} XP · +{diff.stat} {card.category.slice(0, 3)} · -{diff.pressureRelief} Bar
                       </span>
                       {/* Penalty Badge & Fail Action */}
                       {!isCompleted && (
-                        <div className="flex items-center gap-1">
-                          <span className="px-2 py-0.5 rounded bg-red-950/90 border border-red-600/50 text-[10px] font-cinzel font-bold text-red-300 shadow">
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 rounded bg-red-950/90 border border-red-600/50 text-[9px] sm:text-[10px] font-cinzel font-bold text-red-300 shadow">
                             -{diff.penalty} {card.category.slice(0, 3)} · +{diff.pressureFail} Bar
                           </span>
                           {onFailTask && (
                             <button
                               type="button"
                               onClick={() => handleFail(task.id)}
-                              className="px-1.5 py-0.5 rounded bg-stone-900 hover:bg-red-950 text-stone-400 hover:text-red-300 border border-stone-700 hover:border-red-700 text-[9px] font-cinzel font-bold transition-all cursor-pointer"
+                              className="min-h-[28px] px-2 py-0.5 rounded bg-stone-900 hover:bg-red-950 text-stone-400 hover:text-red-300 border border-stone-700 hover:border-red-700 text-[10px] font-cinzel font-bold transition-all cursor-pointer"
                               title={`Concede quest: -${diff.penalty} Stat, +${diff.pressureFail} Reincarnation Pressure`}
                             >
                               Fail
@@ -390,7 +395,7 @@ export default function CardDetailModal({
             {/* Section Header */}
             <div className="flex items-center justify-between border-b border-amber-900/60 pb-1.5 text-xs font-cinzel text-amber-300">
               <div className="flex items-center gap-2">
-                <span className="text-sm">📜</span>
+                <Scroll className="w-4 h-4 text-amber-400 shrink-0" />
                 <span className="font-bold tracking-wide">Task History (Deeds Since Midnight IST)</span>
               </div>
               <span className="px-2 py-0.5 rounded-full bg-black/60 border border-amber-600/40 text-[10px] text-amber-300 font-bold">
@@ -434,20 +439,20 @@ export default function CardDetailModal({
                   return (
                     <div 
                       key={task.id}
-                      className="p-3 rounded-xl border border-amber-700/60 bg-gradient-to-r from-[#201208]/90 via-[#180d05]/90 to-[#120703]/90 shadow-md flex items-center justify-between gap-3"
+                      className="p-2.5 sm:p-3 rounded-xl border border-amber-700/60 bg-gradient-to-r from-[#201208]/90 via-[#180d05]/90 to-[#120703]/90 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3"
                     >
                       {/* Left: Category Icon & Details */}
-                      <div className="flex items-center space-x-3 min-w-0">
+                      <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
                         <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${catTheme.bg} ${catTheme.border} ${catTheme.text} shadow-sm`}>
                           <IconComponent className="w-4 h-4" />
                         </div>
 
                         <div className="min-w-0">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1.5 sm:space-x-2">
                             <h4 className="font-garamond font-bold text-sm sm:text-base text-parchment-100 truncate">
                               {task.title}
                             </h4>
-                            <span className="text-[10px] font-cinzel uppercase px-2 py-0.5 rounded-full bg-black/60 border border-amber-600/40 text-amber-300/90 tracking-wider shrink-0">
+                            <span className="text-[9px] sm:text-[10px] font-cinzel uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-black/60 border border-amber-600/40 text-amber-300/90 tracking-wider shrink-0">
                               {task.category}
                             </span>
                           </div>
@@ -459,8 +464,8 @@ export default function CardDetailModal({
                       </div>
 
                       {/* Right: Honor Badge */}
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-950/90 border border-emerald-500/60 text-[10px] font-cinzel font-bold text-emerald-300 shadow">
+                      <div className="flex items-center sm:flex-col sm:items-end justify-between sm:justify-start gap-1 shrink-0 pl-11 sm:pl-0">
+                        <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-emerald-950/90 border border-emerald-500/60 text-[9px] sm:text-[10px] font-cinzel font-bold text-emerald-300 shadow">
                           +{diff.xp} XP · +{diff.stat} {task.category.slice(0, 3)}
                         </span>
                         <span className="text-[9px] font-cinzel text-amber-400/80 uppercase tracking-wider">

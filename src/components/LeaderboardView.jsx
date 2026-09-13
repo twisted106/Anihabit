@@ -25,24 +25,24 @@ export default function LeaderboardView({
     <div className="w-full max-w-4xl mx-auto space-y-4" data-purpose="screen-leaderboard">
       
       {/* Header Banner */}
-      <div className="carved-plaque px-6 py-3.5 rounded-xl border-2 border-amber-700/80 shadow-2xl flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-300 p-0.5 border border-amber-800 shadow">
+      <div className="carved-plaque px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl border-2 border-amber-700/80 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-300 p-0.5 border border-amber-800 shadow shrink-0">
             <div className="w-full h-full rounded-full bg-stone-950 flex items-center justify-center">
-              <Trophy className="w-5 h-5 text-amber-400" />
+              <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
             </div>
           </div>
-          <div>
-            <h2 className="font-cinzel font-black text-base sm:text-lg text-amber-200 tracking-wider uppercase drop-shadow">
+          <div className="min-w-0">
+            <h2 className="font-cinzel font-black text-sm sm:text-base md:text-lg text-amber-200 tracking-wider uppercase drop-shadow truncate">
               Guild Grand Leaderboard
             </h2>
-            <p className="text-xs font-newsreader text-stone-300 italic">
-              Ranked purely by Average Stat Power (Strength + Intellect + Discipline + Willpower) / 4
+            <p className="text-[11px] sm:text-xs font-newsreader text-stone-300 italic">
+              Ranked purely by Average Stat Power (STR + INT + DIS + WIL) / 4
             </p>
           </div>
         </div>
 
-        <div className="text-[11px] font-cinzel text-amber-300/80 px-3 py-1 rounded bg-amber-950/80 border border-amber-700/60 shadow">
+        <div className="text-[11px] font-cinzel text-amber-300/80 px-3 py-1 rounded bg-amber-950/80 border border-amber-700/60 shadow shrink-0">
           Your Score: <strong className="text-amber-200 font-bold">{powerScore}</strong>
         </div>
       </div>

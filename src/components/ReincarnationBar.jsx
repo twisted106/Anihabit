@@ -25,9 +25,7 @@ export default function ReincarnationBar({
     >
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
         <div className="flex items-center space-x-2">
-          <span className="text-amber-400 text-base flame-glow" role="img" aria-label="Flame">
-            🔥
-          </span>
+          <Flame className="w-4 h-4 text-amber-400 shrink-0" />
           <h2 
             id="pressure-meter-label"
             className="font-cinzel font-black text-xs sm:text-sm uppercase tracking-widest text-amber-200 drop-shadow"
@@ -47,9 +45,9 @@ export default function ReincarnationBar({
         <div className="flex flex-wrap items-center gap-2">
           {/* Demo Reincarnation Testing Button Group */}
           {onAdjustPressure && (
-            <div className="flex items-center gap-1.5 bg-black/60 border border-amber-700/60 px-2 py-1 rounded-lg shadow-inner">
+            <div className="flex flex-wrap items-center gap-1.5 bg-black/60 border border-amber-700/60 px-2 py-1 rounded-lg shadow-inner">
               <span className="text-[10px] font-cinzel text-amber-400/90 uppercase tracking-wider font-bold mr-0.5">
-                🧪 Demo Test:
+                Demo Test:
               </span>
 
               {/* Simulate Task Fail: Hard (+8), Medium (+9), Easy (+10) */}
@@ -59,41 +57,41 @@ export default function ReincarnationBar({
                 className="px-1.5 py-0.5 rounded bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
                 title="Simulate Hard task fail (+8 Pressure)"
               >
-                +8 (Hard Miss)
+                +8% (Fail Hard)
               </button>
               <button
                 type="button"
                 onClick={() => onAdjustPressure(9)}
-                className="px-1.5 py-0.5 rounded bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/60 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                className="px-1.5 py-0.5 rounded bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
                 title="Simulate Medium task fail (+9 Pressure)"
               >
-                +9 (Med Miss)
+                +9% (Fail Med)
               </button>
               <button
                 type="button"
                 onClick={() => onAdjustPressure(10)}
-                className="px-1.5 py-0.5 rounded bg-red-950 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/70 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                className="px-1.5 py-0.5 rounded bg-red-950/60 hover:bg-red-900 text-red-300 hover:text-white border border-red-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
                 title="Simulate Easy task fail (+10 Pressure)"
               >
-                +10 (Easy Miss)
+                +10% (Fail Easy)
               </button>
 
-              {/* Simulate Task Complete (-3, -2, -1) */}
+              {/* Simulate Task Complete: Hard (-3), Medium (-2), Easy (-1) */}
               <button
                 type="button"
                 onClick={() => onAdjustPressure(-3)}
-                className="px-1.5 py-0.5 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/70 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
                 title="Simulate Hard task complete (-3 Pressure)"
               >
-                -3 (Hard Win)
+                -3% (Done Hard)
               </button>
               <button
                 type="button"
                 onClick={() => onAdjustPressure(-2)}
-                className="px-1.5 py-0.5 rounded bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/60 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
+                className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
                 title="Simulate Medium task complete (-2 Pressure)"
               >
-                -2 (Med Win)
+                -2% (Done Med)
               </button>
               <button
                 type="button"
@@ -101,7 +99,7 @@ export default function ReincarnationBar({
                 className="px-1.5 py-0.5 rounded bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 hover:text-white border border-emerald-700/50 text-[10px] font-cinzel font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus:outline-none"
                 title="Simulate Easy task complete (-1 Pressure)"
               >
-                -1 (Easy Win)
+                -1% (Done Easy)
               </button>
 
               {/* Button 2: Immediate 100% Crisis Trigger */}
@@ -111,7 +109,7 @@ export default function ReincarnationBar({
                 className="px-2.5 py-0.5 rounded bg-gradient-to-r from-red-700 to-amber-600 hover:from-red-600 hover:to-amber-500 text-amber-100 hover:text-white border border-amber-400/80 text-[10px] font-cinzel font-black shadow transition-all active:scale-95 cursor-pointer focus:outline-none"
                 title="Immediately surge pressure to 100% to test the Crisis Dilemma Modal"
               >
-                ⚡ Test 100% Crisis
+                Test 100% Crisis
               </button>
 
               {/* Button 3: Reset to 0% */}

@@ -55,7 +55,7 @@ export default function CharacterPanel({
         {/* Hero Avatar & Identity */}
         <div className="flex items-center gap-4">
           <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-950 to-rpg-dark border-2 ${frameBorderClass} flex items-center justify-center relative shadow-lg`}>
-            <span className="text-3xl select-none" role="img" aria-label="Hero Avatar">🧙‍♂️</span>
+            <Shield className="w-8 h-8 text-indigo-400" />
             <div className="absolute -bottom-2 -right-1 px-2 py-0.5 rounded-md bg-indigo-600 border border-indigo-400 text-[10px] font-bold text-white tracking-wider shadow">
               LVL {currentLevel}
             </div>

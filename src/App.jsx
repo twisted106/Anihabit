@@ -24,7 +24,6 @@ import AddChallengeModal from './components/AddChallengeModal';
 import CrisisModal from './components/CrisisModal';
 import AuthModal from './components/AuthModal';
 import ToastContainer from './components/ToastContainer';
-import { Trophy, Shield, Scroll, ShoppingBag } from 'lucide-react';
 
 export default function App() {
   const {
@@ -103,8 +102,19 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#120803] text-[#faecd1] font-garamond flex flex-col selection:bg-amber-800 selection:text-amber-100 antialiased pb-20 sm:pb-8 relative">
+    <div className="min-h-screen bg-[#120803] text-[#faecd1] font-garamond flex flex-col selection:bg-amber-800 selection:text-amber-100 antialiased pb-6 sm:pb-8 relative">
       
+      {/* Main Full-Screen Background Image for Game View (Task / Habit) Section */}
+      {activeTab === 'gameview' && (
+        <div 
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none transition-opacity duration-300"
+          style={{
+            backgroundImage: `linear-gradient(to bottom, rgba(14, 7, 3, 0.45), rgba(10, 5, 2, 0.35), rgba(14, 7, 3, 0.6)), url('/images/task_habit_bg.jpg')`
+          }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Main Full-Screen Background Image for Leaderboard Section */}
       {activeTab === 'leaderboard' && (
         <div 
@@ -205,73 +215,7 @@ export default function App() {
 
       </main>
 
-      {/* 3. Mobile Fixed Bottom Navigation Bar (4 Circular Medallions) */}
-      <nav 
-        className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-gradient-to-t from-[#160b05] via-[#201007] to-[#2b170c] border-t-2 border-amber-800/80 px-4 py-2 flex items-center justify-around shadow-[0_-8px_20px_rgba(0,0,0,0.9)]"
-        aria-label="Mobile Navigation"
-      >
-        {/* Leaderboard Medallion */}
-        <button
-          type="button"
-          onClick={() => handleTabSwitch('leaderboard')}
-          className="flex flex-col items-center focus:outline-none"
-          aria-label="Leaderboard"
-        >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-transform ${
-            activeTab === 'leaderboard' ? 'bg-amber-600 border-yellow-200 scale-110 shadow-lg' : 'bg-stone-900 border-amber-900 text-stone-400'
-          }`}>
-            <Trophy className="w-4 h-4 text-amber-300" />
-          </div>
-          <span className="text-[9px] font-cinzel font-bold text-amber-300/90 mt-0.5">Rank</span>
-        </button>
-
-        {/* Dashboard Medallion */}
-        <button
-          type="button"
-          onClick={() => handleTabSwitch('dashboard')}
-          className="flex flex-col items-center focus:outline-none"
-          aria-label="Player Sheet"
-        >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-transform ${
-            activeTab === 'dashboard' ? 'bg-emerald-700 border-emerald-300 scale-110 shadow-lg' : 'bg-stone-900 border-amber-900 text-stone-400'
-          }`}>
-            <Shield className="w-4 h-4 text-emerald-300" />
-          </div>
-          <span className="text-[9px] font-cinzel font-bold text-emerald-300/90 mt-0.5">Hero</span>
-        </button>
-
-        {/* Habit / Task Medallion */}
-        <button
-          type="button"
-          onClick={() => handleTabSwitch('gameview')}
-          className="flex flex-col items-center focus:outline-none"
-          aria-label="Tabletop Arena"
-        >
-          <div className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-transform ${
-            activeTab === 'gameview' ? 'bg-amber-500 border-yellow-100 scale-115 shadow-[0_0_12px_rgba(245,180,40,0.8)]' : 'bg-stone-900 border-amber-900 text-stone-400'
-          }`}>
-            <Scroll className="w-5 h-5 text-[#faecd1]" />
-          </div>
-          <span className="text-[9px] font-cinzel font-black text-amber-300 mt-0.5">Arena</span>
-        </button>
-
-        {/* Shop Medallion */}
-        <button
-          type="button"
-          onClick={() => handleTabSwitch('shop')}
-          className="flex flex-col items-center focus:outline-none"
-          aria-label="Shop"
-        >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center border transition-transform ${
-            activeTab === 'shop' ? 'bg-purple-700 border-purple-300 scale-110 shadow-lg' : 'bg-stone-900 border-amber-900 text-stone-400'
-          }`}>
-            <ShoppingBag className="w-4 h-4 text-purple-300" />
-          </div>
-          <span className="text-[9px] font-cinzel font-bold text-purple-300/90 mt-0.5">Bazaar</span>
-        </button>
-      </nav>
-
-      {/* 4. MODALS & OVERLAYS */}
+      {/* 3. MODALS & OVERLAYS */}
 
       {/* SCREEN 1 — Auth Modal */}
       <AuthModal 
