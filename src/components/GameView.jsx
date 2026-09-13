@@ -96,12 +96,15 @@ export default function GameView({
   stats,
   tasks = [],
   habits = [],
+  claimedBossesThisCycle = [],
+  currentCycleId,
   onInspectCard,
   onOpenAddChallenge,
   onOpenTradeoffModal,
   onAdjustPressure,
   onCompleteHabit,
-  onDeleteHabit
+  onDeleteHabit,
+  onOpenCustomizeProfile
 }) {
   // Mode toggle: 'tasks' | 'habits'
   const [viewMode, setViewMode] = useState('tasks');
@@ -204,17 +207,16 @@ export default function GameView({
         <div className="lg:col-span-4 flex flex-col items-center" data-purpose="player-knight-card">
           <div className="w-full max-w-sm">
             <TabletopCard
-              name="Knight Protector"
+              name={profile?.display_name || "Knight Protector"}
               category="Champion"
-              imageSrc={KNIGHT_PROTECTOR_ART}
+              imageSrc={profile?.avatar_url || KNIGHT_PROTECTOR_ART}
               categoryBadge="Champion"
               statusBadge="READY"
-              stats={stats}
               onClick={() => onInspectCard({ 
                 type: 'player', 
-                name: 'Knight Protector', 
+                name: profile?.display_name || 'Knight Protector', 
                 category: 'Champion',
-                imageSrc: KNIGHT_PROTECTOR_ART,
+                imageSrc: profile?.avatar_url || KNIGHT_PROTECTOR_ART,
                 stats 
               })}
               isPlayer
@@ -237,22 +239,36 @@ export default function GameView({
               </p>
             </div>
 
-            {/* Inspect Knight / Character Sheet Trigger */}
-            <div className="text-center mt-3">
-              <button
-                type="button"
-                onClick={() => onInspectCard({ 
-                  type: 'player', 
-                  name: 'Knight Protector', 
-                  category: 'Champion',
-                  imageSrc: KNIGHT_PROTECTOR_ART,
-                  stats 
-                })}
-                className="text-xs font-cinzel text-amber-400/80 hover:text-amber-200 underline decoration-amber-600 inline-flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer"
-              >
-                <span>View Character Sheet</span>
-                <span>→</span>
-              </button>
+            {/* Action Buttons beneath Player Card */}
+            <div className="w-full mt-3.5 space-y-2 px-1">
+              {onOpenCustomizeProfile && (
+                <button
+                  type="button"
+                  onClick={onOpenCustomizeProfile}
+                  className="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-cinzel font-black text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(245,180,40,0.5)] border border-amber-300 cursor-pointer flex items-center justify-center gap-2 active:scale-[0.99]"
+                >
+                  <span className="text-sm">⚔️</span>
+                  <span>Customize Champion Profile</span>
+                  <span className="text-sm">⚔️</span>
+                </button>
+              )}
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => onInspectCard({ 
+                    type: 'player', 
+                    name: profile?.display_name || 'Knight Protector', 
+                    category: 'Champion',
+                    imageSrc: profile?.avatar_url || KNIGHT_PROTECTOR_ART,
+                    stats 
+                  })}
+                  className="text-xs font-cinzel text-amber-400/80 hover:text-amber-200 underline decoration-amber-600 inline-flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer"
+                >
+                  <span>View Deed Ledger & History</span>
+                  <span>→</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -281,6 +297,7 @@ export default function GameView({
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
                 {CATEGORY_ADVERSARIES.map((enemy) => {
                   const activeCount = getCategoryActiveCount(enemy.category);
+                  const isClaimed = claimedBossesThisCycle?.includes(enemy.category);
                   return (
                     <TabletopCard
                       key={enemy.category}
@@ -289,15 +306,17 @@ export default function GameView({
                       imageSrc={enemy.imageSrc}
                       imageFilterClass={enemy.imageFilterClass}
                       categoryBadge={enemy.categoryBadge}
-                      statusBadge={`${activeCount} Active`}
-                      stats={stats}
+                      statusBadge={activeCount === 0 ? 'DEFEATED' : `${activeCount} Active`}
+                      bountyBadge={isClaimed ? '✦ 50 GP Claimed' : '✦ 50 GP Bounty'}
                       isGreyedOut={activeCount === 0}
                       onClick={() => onInspectCard({ 
                         type: 'enemy', 
                         name: enemy.name, 
                         category: enemy.category, 
                         imageSrc: enemy.imageSrc,
-                        stats 
+                        stats,
+                        isBossClaimed: isClaimed,
+                        currentCycleId
                       })}
                     />
                   );
