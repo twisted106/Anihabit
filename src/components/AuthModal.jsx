@@ -25,6 +25,12 @@ export default function AuthModal({ isOpen, onClose, onGuestMode, notify }) {
     setErrorMsg('');
     setLoading(true);
 
+    if (!isSupabaseConfigured || !supabase) {
+      setErrorMsg('Supabase is not configured. Please set up your .env file.');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({ email, password });
@@ -52,7 +58,7 @@ export default function AuthModal({ isOpen, onClose, onGuestMode, notify }) {
       onClick={onClose}
     >
       <div 
-        className="guardian-card-frame w-full max-w-md p-6 sm:p-7 bg-wood-planks border-4 border-[#201308] relative shadow-2xl cursor-default"
+        className="guardian-card-frame w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-7 bg-wood-planks border-4 border-[#201308] relative shadow-2xl cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         
@@ -60,14 +66,14 @@ export default function AuthModal({ isOpen, onClose, onGuestMode, notify }) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full bg-stone-900 border border-amber-600/60 text-amber-200 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-amber-400"
+          className="absolute top-3 sm:top-4 right-3 sm:right-4 w-9 h-9 flex items-center justify-center rounded-full bg-stone-900 border border-amber-600/60 text-amber-200 hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer z-10"
           aria-label="Close login modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
-        <div className="guardian-dark-inset rounded-lg py-2 px-3 text-center mb-5">
+        <div className="guardian-dark-inset rounded-lg py-2 sm:py-2.5 px-3 text-center mb-4 sm:mb-5">
           <h2 id="auth-dialog-title" className="font-cinzel font-black text-lg sm:text-xl text-[#faecd1] tracking-wider uppercase drop-shadow">
             {isSignUp ? 'Register Tavern Adventurer' : 'Adventurer Log In'}
           </h2>
@@ -126,7 +132,7 @@ export default function AuthModal({ isOpen, onClose, onGuestMode, notify }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full wax-seal py-3 px-4 rounded-xl border-2 border-amber-400 shadow-2xl font-cinzel font-bold text-sm text-[#faecd1] tracking-wider uppercase transition-all disabled:opacity-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-300"
+            className="w-full min-h-[44px] wax-seal py-2.5 sm:py-3 px-4 rounded-xl border-2 border-amber-400 shadow-2xl font-cinzel font-bold text-xs sm:text-sm text-[#faecd1] tracking-wider uppercase transition-all disabled:opacity-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-300"
           >
             {loading ? 'Consulting archives...' : isSignUp ? 'Inscribe & Begin Journey' : 'Enter the Tabletop'}
           </button>
@@ -143,21 +149,21 @@ export default function AuthModal({ isOpen, onClose, onGuestMode, notify }) {
               setIsSignUp(!isSignUp);
               setErrorMsg('');
             }}
-            className="text-amber-400 hover:text-amber-200 font-bold underline decoration-amber-600 focus:outline-none"
+            className="min-h-[36px] flex items-center text-amber-400 hover:text-amber-200 font-bold underline decoration-amber-600 focus:outline-none cursor-pointer"
           >
             {isSignUp ? 'Switch to Login' : 'Create New Character'}
           </button>
         </div>
 
         {/* Demo Mode Button */}
-        <div className="mt-4">
+        <div className="mt-3 sm:mt-4">
           <button
             type="button"
             onClick={() => {
               onGuestMode?.();
               onClose();
             }}
-            className="w-full py-2 px-3 bg-stone-900 hover:bg-stone-800 text-amber-300 rounded-lg text-xs font-cinzel border border-amber-800/60 flex items-center justify-center gap-1.5 transition-colors focus:outline-none focus:ring-1 focus:ring-amber-400"
+            className="w-full min-h-[44px] py-2.5 px-3 bg-stone-900 hover:bg-stone-800 text-amber-300 rounded-lg text-xs font-cinzel border border-amber-800/60 flex items-center justify-center gap-1.5 transition-colors focus:outline-none focus:ring-1 focus:ring-amber-400 cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Continue as Guest Hero (Instant Demo)</span>

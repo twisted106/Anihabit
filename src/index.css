@@ -3,11 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  html, body {
     background-color: #120803;
     color: #faecd1;
     font-family: 'EB Garamond', Garamond, serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   /* Custom styled scrollbars */

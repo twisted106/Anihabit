@@ -107,7 +107,6 @@ export default function CreateTaskModal({ isOpen, onClose, onCreateTask }) {
                     <span className="text-xs text-white">{cat.name}</span>
                     <span className="text-[10px] text-slate-400">+{cat.statLabel}</span>
                   </div>
-                  <span className="text-base">{cat.arenaBoss.emoji}</span>
                 </button>
               ))}
             </div>
